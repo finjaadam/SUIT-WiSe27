@@ -1,4 +1,5 @@
 import { FilesetResolver, PoseLandmarker, type PoseLandmarkerResult, DrawingUtils } from '@mediapipe/tasks-vision';
+import { MotionMeter } from './motion';
 
 const video      = document.getElementById('video')       as HTMLVideoElement;
 const canvas     = document.getElementById('canvas')      as HTMLCanvasElement;
@@ -6,6 +7,7 @@ const ctx        = canvas.getContext('2d')                as CanvasRenderingCont
 
 let drawingUtils: DrawingUtils | undefined;
 let poseLandmarker: PoseLandmarker;
+let motionMeter: MotionMeter;
 
 async function initMediaPipe() {
     try {
@@ -34,6 +36,7 @@ async function startCamera() {
     video.addEventListener('loadeddata', () => {
         canvas.width  = video.videoWidth;
         canvas.height = video.videoHeight;
+        motionMeter   = new MotionMeter(video.videoWidth / video.videoHeight);
         video.play();
         renderLoop();
     });
@@ -49,7 +52,10 @@ function renderLoop(): void {
         console.log(poseLandmarkerResult);
         
         displayVideoResult(poseLandmarkerResult);
-        
+
+        const intensity = motionMeter.update(poseLandmarkerResult.landmarks[0], startTimeMs);
+        console.log(`Bewegungsstärke: ${intensity.toFixed(2)}`);
+
         lastVideoTime = video.currentTime;
     }
 
