@@ -10,6 +10,10 @@ const RIGHT_HIP      = 24;
 const MIN_VISIBILITY    = 0.5;
 const SMOOTHING_SECONDS = 0.3;
 const TORSO_PER_SHOULDER_WIDTH = 1.4;
+// Smaller body sizes (fraction of image height) are measurement errors, e.g. shoulders overlapping when turned sideways
+const MIN_BODY_SCALE = 0.05;
+// Faster points (torso lengths per second) are not human movement, e.g. tracking jumped to another person
+const MAX_POINT_SPEED = 15;
 
 type Point = { x: number; y: number };
 
@@ -32,67 +36,68 @@ export class MotionMeter {
     }
 
     update(landmarks: NormalizedLandmark[] | undefined, timeMs: number): number {
-        const dtSeconds = this.previousTimeMs === undefined ? 0 : (timeMs - this.previousTimeMs) / 1000;
+        const previous       = this.previous;
+        const previousTimeMs = this.previousTimeMs;
+        this.previous       = landmarks;
         this.previousTimeMs = timeMs;
 
-        const rawSpeed = dtSeconds > 0 ? this.measureSpeed(landmarks, dtSeconds) : undefined;
-        this.previous = landmarks;
+        if (previousTimeMs === undefined || timeMs <= previousTimeMs) return this.intensity;
 
-        if (dtSeconds <= 0) return this.intensity;
-
+        const dtSeconds = (timeMs - previousTimeMs) / 1000;
         // Without a measurement (no person), the value slowly decays to 0
-        const target = rawSpeed ?? 0;
-        const alpha  = 1 - Math.exp(-dtSeconds / SMOOTHING_SECONDS);
-        this.intensity += (target - this.intensity) * alpha;
+        const speed = this.measureSpeed(previous, landmarks, dtSeconds) ?? 0;
+
+        const alpha = 1 - Math.exp(-dtSeconds / SMOOTHING_SECONDS);
+        this.intensity += (speed - this.intensity) * alpha;
 
         return this.intensity;
     }
 
-    private measureSpeed(current: NormalizedLandmark[] | undefined, dtSeconds: number): number | undefined {
-        const previous = this.previous;
-        if (!current || !previous) return undefined;
+    private measureSpeed(
+        previous: NormalizedLandmark[] | undefined,
+        current: NormalizedLandmark[] | undefined,
+        dtSeconds: number,
+    ): number | undefined {
+        if (!previous || !current) return undefined;
 
         const bodyScale = this.bodyScale(current);
         if (!bodyScale) return undefined;
 
-        let distanceSum = 0;
+        let speedSum = 0;
         let count = 0;
         for (let i = FIRST_BODY_LANDMARK; i < current.length; i++) {
             if (!isVisible(current[i]) || !isVisible(previous[i])) continue;
-            distanceSum += distance(this.toPoint(current[i]), this.toPoint(previous[i]));
+            const speed = this.distance(current[i], previous[i]) / bodyScale / dtSeconds;
+            if (speed > MAX_POINT_SPEED) continue;
+            speedSum += speed;
             count++;
         }
         if (count === 0) return undefined;
 
-        return distanceSum / count / bodyScale / dtSeconds;
+        return speedSum / count;
     }
 
     private bodyScale(landmarks: NormalizedLandmark[]): number | undefined {
         const ls = landmarks[LEFT_SHOULDER];
         const rs = landmarks[RIGHT_SHOULDER];
-        if (!isVisible(ls) || !isVisible(rs)) return undefined;
-
-        const shoulderMid = midpoint(this.toPoint(ls), this.toPoint(rs));
         const lh = landmarks[LEFT_HIP];
         const rh = landmarks[RIGHT_HIP];
-        if (isVisible(lh) && isVisible(rh)) {
-            return distance(shoulderMid, midpoint(this.toPoint(lh), this.toPoint(rh)));
-        }
-        return distance(this.toPoint(ls), this.toPoint(rs)) * TORSO_PER_SHOULDER_WIDTH;
+        if (!isVisible(ls) || !isVisible(rs)) return undefined;
+
+        const scale = isVisible(lh) && isVisible(rh)
+            ? this.distance(midpoint(ls, rs), midpoint(lh, rh))
+            : this.distance(ls, rs) * TORSO_PER_SHOULDER_WIDTH;
+        return scale >= MIN_BODY_SCALE ? scale : undefined;
     }
 
     // Scale x to the height so horizontal and vertical distances are comparable
-    private toPoint(landmark: NormalizedLandmark): Point {
-        return { x: landmark.x * this.aspectRatio, y: landmark.y };
+    private distance(a: Point, b: Point): number {
+        return Math.hypot((a.x - b.x) * this.aspectRatio, a.y - b.y);
     }
 }
 
-function isVisible(landmark: NormalizedLandmark | undefined): landmark is NormalizedLandmark {
-    return landmark !== undefined && (landmark.visibility ?? 0) >= MIN_VISIBILITY;
-}
-
-function distance(a: Point, b: Point): number {
-    return Math.hypot(a.x - b.x, a.y - b.y);
+function isVisible(landmark: NormalizedLandmark): boolean {
+    return landmark.visibility >= MIN_VISIBILITY;
 }
 
 function midpoint(a: Point, b: Point): Point {

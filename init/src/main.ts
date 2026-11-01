@@ -1,9 +1,10 @@
 import { FilesetResolver, PoseLandmarker, type PoseLandmarkerResult, DrawingUtils } from '@mediapipe/tasks-vision';
 import { MotionMeter } from './motion';
 
-const video      = document.getElementById('video')       as HTMLVideoElement;
-const canvas     = document.getElementById('canvas')      as HTMLCanvasElement;
-const ctx        = canvas.getContext('2d')                as CanvasRenderingContext2D;
+const video       = document.getElementById('video')        as HTMLVideoElement;
+const canvas      = document.getElementById('canvas')       as HTMLCanvasElement;
+const ctx         = canvas.getContext('2d')                 as CanvasRenderingContext2D;
+const motionValue = document.getElementById('motion-value') as HTMLDivElement;
 
 let drawingUtils: DrawingUtils | undefined;
 let poseLandmarker: PoseLandmarker;
@@ -54,7 +55,7 @@ function renderLoop(): void {
         displayVideoResult(poseLandmarkerResult);
 
         const intensity = motionMeter.update(poseLandmarkerResult.landmarks[0], startTimeMs);
-        console.log(`Bewegungsstärke: ${intensity.toFixed(2)}`);
+        motionValue.textContent = intensity.toFixed(2);
 
         lastVideoTime = video.currentTime;
     }
