@@ -65,6 +65,7 @@ export class ActivityBar {
     private readonly container: HTMLElement;
     private readonly fill: HTMLDivElement;
     private readonly max: number;
+    // needed for stop-function
     readonly threshold: number;
 
     constructor(container: HTMLElement, options: { max?: number; threshold?: number } = {}) {

@@ -2,6 +2,7 @@ import {DrawingUtils, FilesetResolver, PoseLandmarker, type PoseLandmarkerResult
 import {MotionMeter} from './motion';
 import {ActivityBar} from './activityBar';
 import {ActivityComments} from './activityComments';
+import {StopGame} from './stopGame';
 
 const video       = document.getElementById('video')        as HTMLVideoElement;
 const canvas      = document.getElementById('canvas')       as HTMLCanvasElement;
@@ -12,6 +13,11 @@ const activityComments = new ActivityComments(
     document.getElementById('activity-comment') as HTMLDivElement,
     activityBar.threshold,
 );
+const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDivElement, {
+    threshold: activityBar.threshold,
+    // Hook for the evaluation screen
+    onFinished: reactionTimeMs => console.log('Reaktionszeit (ms):', reactionTimeMs),
+});
 
 let drawingUtils: DrawingUtils | undefined;
 let poseLandmarker: PoseLandmarker;
@@ -64,6 +70,7 @@ function renderLoop(): void {
         motionValue.textContent = intensity.toFixed(2);
         activityBar.update(intensity);
         activityComments.update(intensity, startTimeMs);
+        stopGame.update(intensity, motionMeter.rawSpeed, startTimeMs);
 
         lastVideoTime = video.currentTime;
     }
