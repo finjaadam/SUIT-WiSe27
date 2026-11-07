@@ -26,6 +26,8 @@ type Point = { x: number; y: number };
  */
 export class MotionMeter {
     intensity = 0;
+    // Unsmoothed speed of the current frame, undefined without a measurement (e.g. no person)
+    rawSpeed: number | undefined;
 
     private readonly aspectRatio: number;
     private previous: NormalizedLandmark[] | undefined;
@@ -41,11 +43,13 @@ export class MotionMeter {
         this.previous       = landmarks;
         this.previousTimeMs = timeMs;
 
+        this.rawSpeed = undefined;
         if (previousTimeMs === undefined || timeMs <= previousTimeMs) return this.intensity;
 
         const dtSeconds = (timeMs - previousTimeMs) / 1000;
+        this.rawSpeed = this.measureSpeed(previous, landmarks, dtSeconds);
         // Without a measurement (no person), the value slowly decays to 0
-        const speed = this.measureSpeed(previous, landmarks, dtSeconds) ?? 0;
+        const speed = this.rawSpeed ?? 0;
 
         const alpha = 1 - Math.exp(-dtSeconds / SMOOTHING_SECONDS);
         this.intensity += (speed - this.intensity) * alpha;

@@ -1,12 +1,18 @@
 import {DrawingUtils, FilesetResolver, PoseLandmarker, type PoseLandmarkerResult} from '@mediapipe/tasks-vision';
 import {MotionMeter} from './motion';
 import {ActivityBar} from './activityBar';
+import {StopGame} from './stopGame';
 
 const video       = document.getElementById('video')        as HTMLVideoElement;
 const canvas      = document.getElementById('canvas')       as HTMLCanvasElement;
 const ctx         = canvas.getContext('2d')                 as CanvasRenderingContext2D;
 const motionValue = document.getElementById('motion-value') as HTMLDivElement;
 const activityBar = new ActivityBar(document.getElementById('activity-bar') as HTMLDivElement);
+const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDivElement, {
+    threshold: activityBar.threshold,
+    // Hook for the evaluation screen
+    onFinished: reactionTimeMs => console.log('Reaktionszeit (ms):', reactionTimeMs),
+});
 
 let drawingUtils: DrawingUtils | undefined;
 let poseLandmarker: PoseLandmarker;
@@ -58,6 +64,7 @@ function renderLoop(): void {
         const intensity = motionMeter.update(poseLandmarkerResult.landmarks[0], startTimeMs);
         motionValue.textContent = intensity.toFixed(2);
         activityBar.update(intensity);
+        stopGame.update(intensity, motionMeter.rawSpeed, startTimeMs);
 
         lastVideoTime = video.currentTime;
     }
