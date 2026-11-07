@@ -36,17 +36,6 @@ Danach die Adresse öffnen, die Vite im Terminal ausgibt (meistens http://localh
 | `npm run build`   | Prüft die Typen mit `tsc` und baut die App nach `dist/` |
 | `npm run preview` | Startet einen lokalen Server für den gebauten Stand  |
 
-## Projektstruktur
-
-```
-init/
-├── index.html                  # Seite mit Canvas und (verstecktem) Video-Element
-├── src/main.ts                 # Kamera starten, Pose erkennen, Skelett zeichnen
-└── public/
-    ├── models/                 # MediaPipe-Modell (pose_landmarker_full.task)
-    └── wasm/                   # MediaPipe-WASM-Dateien
-```
-
 ## Fehlerbehebung
 
 - **Kein Bild bzw. Skelett:** Prüfen, ob der Browser Zugriff auf die Kamera hat. `getUserMedia` funktioniert nur über `localhost` oder HTTPS.

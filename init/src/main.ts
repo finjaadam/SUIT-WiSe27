@@ -1,10 +1,12 @@
-import { FilesetResolver, PoseLandmarker, type PoseLandmarkerResult, DrawingUtils } from '@mediapipe/tasks-vision';
-import { MotionMeter } from './motion';
+import {DrawingUtils, FilesetResolver, PoseLandmarker, type PoseLandmarkerResult} from '@mediapipe/tasks-vision';
+import {MotionMeter} from './motion';
+import {ActivityBar} from './activityBar';
 
 const video       = document.getElementById('video')        as HTMLVideoElement;
 const canvas      = document.getElementById('canvas')       as HTMLCanvasElement;
 const ctx         = canvas.getContext('2d')                 as CanvasRenderingContext2D;
 const motionValue = document.getElementById('motion-value') as HTMLDivElement;
+const activityBar = new ActivityBar(document.getElementById('activity-bar') as HTMLDivElement);
 
 let drawingUtils: DrawingUtils | undefined;
 let poseLandmarker: PoseLandmarker;
@@ -30,10 +32,9 @@ async function initMediaPipe() {
 }
 
 async function startCamera() {
-    const stream = await navigator.mediaDevices.getUserMedia({
-        video: { width: 1280, height: 720 },
+    video.srcObject = await navigator.mediaDevices.getUserMedia({
+        video: {width: 1280, height: 720},
     });
-    video.srcObject = stream;
     video.addEventListener('loadeddata', () => {
         canvas.width  = video.videoWidth;
         canvas.height = video.videoHeight;
@@ -56,6 +57,7 @@ function renderLoop(): void {
 
         const intensity = motionMeter.update(poseLandmarkerResult.landmarks[0], startTimeMs);
         motionValue.textContent = intensity.toFixed(2);
+        activityBar.update(intensity);
 
         lastVideoTime = video.currentTime;
     }
