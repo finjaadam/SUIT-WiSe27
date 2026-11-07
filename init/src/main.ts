@@ -1,6 +1,7 @@
 import {DrawingUtils, FilesetResolver, PoseLandmarker, type PoseLandmarkerResult} from '@mediapipe/tasks-vision';
 import {MotionMeter} from './motion';
 import {ActivityBar} from './activityBar';
+import {ActivityComments} from './activityComments';
 import {StopGame} from './stopGame';
 
 const video       = document.getElementById('video')        as HTMLVideoElement;
@@ -8,6 +9,10 @@ const canvas      = document.getElementById('canvas')       as HTMLCanvasElement
 const ctx         = canvas.getContext('2d')                 as CanvasRenderingContext2D;
 const motionValue = document.getElementById('motion-value') as HTMLDivElement;
 const activityBar = new ActivityBar(document.getElementById('activity-bar') as HTMLDivElement);
+const activityComments = new ActivityComments(
+    document.getElementById('activity-comment') as HTMLDivElement,
+    activityBar.threshold,
+);
 const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDivElement, {
     threshold: activityBar.threshold,
     // Hook for the evaluation screen
@@ -64,6 +69,7 @@ function renderLoop(): void {
         const intensity = motionMeter.update(poseLandmarkerResult.landmarks[0], startTimeMs);
         motionValue.textContent = intensity.toFixed(2);
         activityBar.update(intensity);
+        activityComments.update(intensity, startTimeMs);
         stopGame.update(intensity, motionMeter.rawSpeed, startTimeMs);
 
         lastVideoTime = video.currentTime;
