@@ -89,6 +89,10 @@ export class StopGame {
         container.append(this.title, this.timer);
     }
 
+    get isActive(): boolean {
+        return this.state === 'active';
+    }
+
     update(intensity: number, rawSpeed: number | undefined, timeMs: number): void {
         if (this.state === 'active') this.updateActive(intensity, timeMs);
         else if (this.state === 'stop') this.updateStop(rawSpeed, timeMs);
