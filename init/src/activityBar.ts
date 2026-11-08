@@ -1,6 +1,6 @@
 // Values in torso lengths per second (see MotionMeter)
 const DEFAULT_MAX       = 5.0;
-const DEFAULT_THRESHOLD = 1.0;
+const DEFAULT_THRESHOLD = 3.0;
 
 // Hue of the fill color: red when calm, blue when very active
 const HUE_EMPTY = 0;
