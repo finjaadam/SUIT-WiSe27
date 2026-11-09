@@ -10,23 +10,65 @@
         padding: 0;
         overflow: hidden; 
       }
+
+      [data-screen="auswertung"] {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: sans-serif;
+        text-align: center;
+      }
+
+      [data-screen="auswertung"][hidden] {
+        display: none;
+      }
+
+      #ergebnis-zeit {
+        font-size: 6rem;
+        font-weight: bold;
+        font-size: 8vh;
+        font-variant-numeric: tabular-nums;
+        text-shadow: 0 0 2px #000;
+        color: #265cc0;
+      }
     </style>
   </head>
   <body>
     <div style="position: relative; width: 100vw; height: 100vh; overflow: hidden;">
+
+      <section data-screen="intro">
+        <h1>Interaktion 1</h1>
+        <p>Hier Text und Anleitungs-Animation</p>
+        <button id="start" disabled>Modell wird geladen…</button>
+        <p id="intro-msg"></p>
+      </section>
+
+      <section data-screen="spiel" hidden>
+        <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 2; transition: all 2s ease-in-out; filter: blur(0px); opacity: 1;"></canvas>
     
-      <canvas id="canvas" style="position: absolute; top: 0; left: 0; width: 100vw; height: 100vh; object-fit: cover; z-index: 2; transition: all 2s ease-in-out; filter: blur(0px); opacity: 1;"></canvas>
-   
-      <video id="video" autoplay playsinline muted style="display: none;"></video>
+        <video id="video" autoplay playsinline muted style="display: none;"></video>
 
-      <div id="motion-value" style="position: absolute; top: 24px; left: 24px; z-index: 3; color: #fff; font: bold 32px sans-serif; text-shadow: 0 0 4px #000;">0.00</div>
+        <div id="motion-value" style="position: absolute; top: 24px; left: 24px; z-index: 3; color: #fff; font: bold 32px sans-serif; text-shadow: 0 0 4px #000;">0.00</div>
 
-      <div id="activity-bar"></div>
+        <div id="activity-bar"></div>
 
-      <div id="activity-comment"></div>
-      <div id="stop-game"></div>
+        <div id="activity-comment"></div>
+        <div id="stop-game"></div>
+      </section>
+
+      <section data-screen="auswertung" hidden>
+        <h2>Du hast<br>
+        <span id="ergebnis-zeit"></span><br>
+        zum Reagieren benötigt.</h2>
+        <p id="ergebnis-text"></p>
+      </section>
     
     </div>
+
+    
 
     <script type="module" src="/src/main.ts"></script>
     
