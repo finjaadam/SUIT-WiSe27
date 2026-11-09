@@ -32,7 +32,7 @@ const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDiv
 let drawingUtils: DrawingUtils | undefined;
 let poseLandmarker: PoseLandmarker;
 let motionMeter: MotionMeter;
-let reactionResult: number | null = null
+let reactionResult: number | null = null;
 let modelReady = false;
 let stream: MediaStream | null = null;
 
