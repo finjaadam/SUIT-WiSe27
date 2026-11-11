@@ -53,7 +53,7 @@
         justify-content: center;
         font-family: sans-serif;
         text-align: left;
-        gap: 2rem;
+        margin-inline: 30vh;
       }
 
       [data-screen="intro"] > div {
@@ -66,6 +66,14 @@
 
       [data-screen="intro"][hidden] {
         display: none;
+      }
+
+      [data-screen="intro"] > div:first-child {
+        flex: 0 0 66.66%;
+      }
+
+      [data-screen="intro"] > div:last-child {
+        flex: 0 0 33.33%;
       }
 
       button {
