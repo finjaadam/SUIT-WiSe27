@@ -34,14 +34,66 @@
         text-shadow: 0 0 2px #000;
         color: #265cc0;
       }
+
+      h1 {
+        font-size: 6rem;
+        font-weight: bold;
+        font-size: 12vh;
+        font-variant-numeric: tabular-nums;
+        text-shadow: 0 0 5px #43738a;
+        color: #265cc0;
+      }
+
+      [data-screen="intro"] {
+        position: absolute;
+        inset: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-family: sans-serif;
+        text-align: center;
+      }
+
+      [data-screen="intro"][hidden] {
+        display: none;
+      }
+
+      button {
+        align-items: center;
+        background-color: #fff;
+        border-radius: 24px;
+        border-color: #77a6f3;
+        box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px,rgba(0, 0, 0, .14) 0 6px 10px 0,rgba(0, 0, 0, .12) 0 1px 18px 0;
+        box-sizing: border-box;
+        color: #292b2c;
+        cursor: pointer;
+        display: inline-flex;
+        font-size: 2.5vh;
+        font-weight: 500;
+        height: 48px;
+        justify-content: center;
+        max-width: 100%;
+        overflow: visible;
+        padding: 2px 24px;
+        position: relative;
+        text-align: center;
+        text-transform: none;
+        transition: box-shadow 280ms cubic-bezier(.4, 0, .2, 1),opacity 15ms linear 30ms,transform 270ms cubic-bezier(0, 0, .2, 1) 0ms;
+      }
+
+      button:hover {
+        background: #F6F9FE;
+        color: #174ea6;
+      }
+
     </style>
   </head>
   <body>
     <div style="position: relative; width: 100vw; height: 100vh; overflow: hidden;">
 
-      <section data-screen="intro">
-        <h1>Interaktion 1</h1>
-        <p>Hier Text und Anleitungs-Animation</p>
+      <section data-screen="intro" hidden>
+        <h1>Beweg dich!</h1>
         <button id="start" disabled>Modell wird geladen…</button>
         <p id="intro-msg"></p>
       </section>
