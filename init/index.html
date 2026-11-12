@@ -104,6 +104,26 @@
         color: #174ea6;
       }
 
+      .intro-gif-wrapper {
+        position: relative;
+        width: 408px;
+        height: 508px;
+      }
+
+      .intro-gif-wrapper .stop-game {
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+      }
+
+      .intro-gif-wrapper .stop-game__title {
+        font-size: 8vh; 
+      }
+
+      .intro-gif-wrapper .stop-game__timer {
+        font-size: 3vh;
+      }
+
     </style>
   </head>
   <body>
@@ -116,7 +136,10 @@
           <p id="intro-msg"></p>
         </div>
         <div>
-          <img src="img/gatze.gif" alt="Tanzende Katze" style="width:408px;height:508px;">
+          <div class="intro-gif-wrapper">
+            <img id="tutorial-img" src="img/gatze.gif" alt="Tanzende Katze" style="width:100%; height:100%; object-fit: cover;">
+            <div id="tutorial-stop"></div>
+        </div>
         </div>
       </section>
 
