@@ -88,6 +88,11 @@ export class ActivityComments {
         this.show(isAbove);
     }
 
+    hide(): void {
+        this.container.textContent = '';
+        this.isAbove = undefined;
+    }
+
     private show(isAbove: boolean): void {
         const comments = isAbove ? POSITIVE_COMMENTS : MOTIVATING_COMMENTS;
         this.current = pickRandom(comments, this.current);

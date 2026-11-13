@@ -85,8 +85,9 @@ function renderLoop(): void {
         const intensity = motionMeter.update(poseLandmarkerResult.landmarks[0], startTimeMs);
         motionValue.textContent = intensity.toFixed(2);
         activityBar.update(intensity);
-        activityComments.update(intensity, startTimeMs);
         stopGame.update(intensity, motionMeter.rawSpeed, startTimeMs);
+        if (stopGame.isActive) activityComments.update(intensity, startTimeMs);
+        else activityComments.hide();
 
         lastVideoTime = video.currentTime;
     }
