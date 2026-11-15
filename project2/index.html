@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interaktion 2</title>
+    <style>
+      html, body {
+        margin: 0;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+
+      #canvas {
+        position: absolute;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        /* Mirror the view so it behaves like a mirror */
+        transform: scaleX(-1);
+      }
+
+      #status {
+        position: absolute;
+        top: 24px;
+        left: 24px;
+        font-size: 24px;
+      }
+    </style>
+  </head>
+  <body>
+    <video id="video" autoplay playsinline muted hidden></video>
+    <canvas id="canvas"></canvas>
+    <p id="status">Modell wird geladen…</p>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

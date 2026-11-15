@@ -1,4 +1,5 @@
-import {DrawingUtils, FilesetResolver, PoseLandmarker, type PoseLandmarkerResult} from '@mediapipe/tasks-vision';
+import {DrawingUtils, PoseLandmarker, type PoseLandmarkerResult} from '@mediapipe/tasks-vision';
+import {createPoseLandmarker} from '../../shared/poseLandmarker';
 import {MotionMeter} from './motion';
 import {ActivityBar} from './activityBar';
 import {ActivityComments} from './activityComments';
@@ -39,16 +40,7 @@ let stream: MediaStream | null = null;
 //läd Modell im Hintergrund
 (async () => {
     try {
-        const vision = await FilesetResolver.forVisionTasks("public/wasm");
-
-        poseLandmarker = await PoseLandmarker.createFromOptions(
-            vision,
-            {
-            baseOptions: {
-                modelAssetPath: "public/models/pose_landmarker_full.task"
-            },
-            runningMode: "VIDEO"
-        });
+        poseLandmarker = await createPoseLandmarker();
         modelReady = true;
         if (currentScreen === 'intro') showIntro();
     } catch (err) {

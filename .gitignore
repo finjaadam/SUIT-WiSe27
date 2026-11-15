@@ -1,2 +1,18 @@
-# jetbrains ide
+# Dependencies and build output (applies to all projects)
+node_modules
+dist
+dist-ssr
+*.local
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Editor and OS files
 .idea
+.vscode/*
+!.vscode/extensions.json
+.DS_Store
+*.suo
+*.sw?
