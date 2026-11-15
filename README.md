@@ -45,3 +45,7 @@ Danach die Adresse öffnen, die Vite im Terminal ausgibt (meistens http://localh
 ## Soundeffekte
 ### Interaction 1
 Music: Sound Effect  by <a href="https://pixabay.com/users/meowmusic-57149811/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=589088">Chinku Agrawal</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=589088">Pixabay</a>
+
+## Ressourcen
+### Interaction 1
+Katzen-Modell: <a href="https://sketchfab.com/3d-models/toon-cat-free-b2bd1ee7858444bda366110a2d960386">Toon Cat by Omabuarts Studio</a>
