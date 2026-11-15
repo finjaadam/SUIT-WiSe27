@@ -5,6 +5,8 @@ export type TutorialCallbacks = {
     onMove?: () => void;
     // The STOP sign appears or the tutorial is stopped
     onStop?: () => void;
+    // Only the STOP sign appears (not when the tutorial is stopped from outside)
+    onStopSign?: () => void;
 };
 
 export class Tutorial {
@@ -69,6 +71,7 @@ export class Tutorial {
             this.stopContainer.classList.add('is-visible');
             this.img.src = this.stillSrc;
             this.callbacks.onStop?.();
+            this.callbacks.onStopSign?.();
 
             this.timeoutId = window.setTimeout(() => {
                 this.runCycle();

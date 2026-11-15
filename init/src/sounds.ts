@@ -1,5 +1,37 @@
 export const SOUNDS = {
-    activityMusic: 'sounds/01interaction_activity_music.mp3',
+    activityMusic: 'sounds_interaction1/01interaction_activity_music.mp3',
+    start:         'sounds_interaction1/02_start.mp3',
+    stop:          'sounds_interaction1/03_stop.mp3',
+    finished:      'sounds_interaction1/04_finished.mp3',
+    timeUp:        'sounds_interaction1/05_time_up.mp3',
+} as const;
+
+/**
+ * Short one-shot sound effect.
+ * If the browser blocks playback (no user interaction yet), the effect is skipped:
+ * playing it later would no longer match the moment.
+ */
+export class SoundEffect {
+    private readonly audio: HTMLAudioElement;
+
+    constructor(src: string, volume = 1) {
+        this.audio = new Audio(src);
+        this.audio.preload = 'auto';
+        this.audio.volume = clamp(volume, 0, 1);
+    }
+
+    play(): void {
+        if (document.hidden) return; // same rule as the music: only the visible tab plays
+        this.audio.currentTime = 0;
+        this.audio.play().catch(() => { /* blocked or file missing: skip */ });
+    }
+}
+
+export const sfx = {
+    start:    new SoundEffect(SOUNDS.start),
+    stop:     new SoundEffect(SOUNDS.stop),
+    finished: new SoundEffect(SOUNDS.finished),
+    timeUp:   new SoundEffect(SOUNDS.timeUp),
 } as const;
 
 // Playback rate of the music
