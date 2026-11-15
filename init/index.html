@@ -11,7 +11,8 @@
         overflow: hidden; 
       }
 
-      [data-screen="auswertung"] {
+      [data-screen="auswertung"],
+      [data-screen="zeitAbgelaufen"] {
         position: absolute;
         inset: 0;
         display: flex;
@@ -22,8 +23,14 @@
         text-align: center;
       }
 
-      [data-screen="auswertung"][hidden] {
+      [data-screen="auswertung"][hidden],
+      [data-screen="zeitAbgelaufen"][hidden] {
         display: none;
+      }
+
+      .timeout-img {
+        height: 25vh;
+        border-radius: 8px;
       }
 
       #ergebnis-zeit {
@@ -161,6 +168,13 @@
         <span id="ergebnis-zeit"></span><br>
         zum Reagieren benötigt.</h2>
         <p id="ergebnis-text"></p>
+      </section>
+
+      <section data-screen="zeitAbgelaufen" hidden>
+        <h1>Zeit abgelaufen!</h1>
+        <img src="img/gatze.png" alt="Katze" class="timeout-img">
+        <h2>Du hast dich in 2 Minuten nicht schnell und lange genug bewegt :(</h2>
+        <p>Das nächste Spiel wird besser!</p>
       </section>
     
     </div>

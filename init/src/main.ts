@@ -42,6 +42,10 @@ let reactionResult: number | null = null;
 let modelReady = false;
 let stream: MediaStream | null = null;
 
+// The game ends unsuccessfully if the player has not finished within this time
+const GAME_TIME_LIMIT_MS = 2 * 60 * 1000;
+let gameStartMs = 0;
+
 //läd Modell im Hintergrund
 (async () => {
     try {
@@ -71,6 +75,7 @@ async function startGame() {
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
     motionMeter = new MotionMeter(video.videoWidth / video.videoHeight);
+    gameStartMs = performance.now();
     renderLoop();
 }
 
@@ -81,6 +86,12 @@ function endGame() {
 
 function renderLoop(): void {
     if (currentScreen  !== 'spiel') return;
+
+    if (performance.now() - gameStartMs >= GAME_TIME_LIMIT_MS) {
+        endGame();
+        showScreen('zeitAbgelaufen');
+        return;
+    }
 
     if (video.currentTime !== lastVideoTime) {
         const startTimeMs = performance.now();
