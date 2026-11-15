@@ -41,7 +41,3 @@ Danach die Adresse öffnen, die Vite im Terminal ausgibt (meistens http://localh
 - **Kein Bild bzw. Skelett:** Prüfen, ob der Browser Zugriff auf die Kamera hat. `getUserMedia` funktioniert nur über `localhost` oder HTTPS.
 - **`Failed to resolve import "@mediapipe/tasks-vision"`:** `npm install` wurde im Hauptverzeichnis nicht ausgeführt (Schritt 1).
 - **Fehler beim Laden des Modells:** In der Browser-Konsole nach `KRITISCHER FEHLER` suchen. Die Dateien in `init/public/models` und `init/public/wasm` müssen vorhanden sein.
-
-## Soundeffekte
-### Interaction 1
-Music: Sound Effect  by <a href="https://pixabay.com/users/meowmusic-57149811/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=589088">Chinku Agrawal</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=589088">Pixabay</a>
