@@ -4,6 +4,7 @@ import {ActivityBar} from './activityBar';
 import {ActivityComments} from './activityComments';
 import {StopGame} from './stopGame';
 import {showScreen, currentScreen} from './screens';
+import { Tutorial } from './tutorial';
 
 const video       = document.getElementById('video')        as HTMLVideoElement;
 const canvas      = document.getElementById('canvas')       as HTMLCanvasElement;
@@ -28,6 +29,11 @@ const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDiv
     },
 
 });
+
+const tutorial = new Tutorial(
+    document.getElementById('tutorial-img') as HTMLImageElement,
+    document.getElementById('tutorial-stop') as HTMLDivElement,
+);
 
 let drawingUtils: DrawingUtils | undefined;
 let poseLandmarker: PoseLandmarker;
@@ -131,9 +137,11 @@ function displayVideoResult(result: PoseLandmarkerResult) {
 function showIntro() {
     startBtn.disabled = !modelReady;
     startBtn.textContent = modelReady ? 'Starten' : 'Modell wird geladen…';
+    tutorial.start();
 }
 
 startBtn.onclick = async () => {
+    tutorial.stop();
     startBtn.disabled = true;
     introMsg.textContent = '';
     try {
