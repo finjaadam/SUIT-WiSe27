@@ -1,6 +1,6 @@
 // Values in torso lengths per second (see MotionMeter)
 const DEFAULT_MAX       = 5.0;
-const DEFAULT_THRESHOLD = 3.0;
+const DEFAULT_THRESHOLD = 1.0;
 
 // Hue of the fill color: red when calm, blue when very active
 const HUE_EMPTY = 0;
@@ -64,7 +64,7 @@ function injectStyles(): void {
 export class ActivityBar {
     private readonly container: HTMLElement;
     private readonly fill: HTMLDivElement;
-    private readonly max: number;
+    readonly max: number;
     // needed for stop-function
     readonly threshold: number;
 
