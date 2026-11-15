@@ -2,7 +2,7 @@
   "name": "suit-wise27",
   "private": true,
   "workspaces": [
-    "init",
+    "project1",
     "project2"
   ],
   "dependencies": {

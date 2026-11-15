@@ -59,6 +59,7 @@ export class StopGame {
     private readonly timer: HTMLDivElement;
     private readonly threshold: number;
     private readonly onFinished?: (reactionTimeMs: number) => void;
+    private readonly onStop?: () => void;
     private readonly stopDelayMs: number;
 
     private state: State = 'active';
@@ -68,13 +69,19 @@ export class StopGame {
 
     constructor(
         container: HTMLElement,
-        options: { threshold: number; onFinished?: (reactionTimeMs: number) => void },
+        options: {
+            threshold: number;
+            onFinished?: (reactionTimeMs: number) => void;
+            // Called when the STOP sign appears
+            onStop?: () => void;
+        },
     ) {
         injectStyles();
 
         this.container   = container;
         this.threshold   = options.threshold;
         this.onFinished  = options.onFinished;
+        this.onStop      = options.onStop;
         this.stopDelayMs = (STOP_DELAY_MIN_SECONDS + Math.random() * (STOP_DELAY_MAX_SECONDS - STOP_DELAY_MIN_SECONDS)) * 1000;
 
         container.classList.add('stop-game');
@@ -87,6 +94,10 @@ export class StopGame {
         this.timer.className = 'stop-game__timer';
 
         container.append(this.title, this.timer);
+    }
+
+    get isActive(): boolean {
+        return this.state === 'active';
     }
 
     update(intensity: number, rawSpeed: number | undefined, timeMs: number): void {
@@ -106,6 +117,7 @@ export class StopGame {
         this.stopStartMs = timeMs;
         this.showTime(0);
         this.container.classList.add('is-visible');
+        this.onStop?.();
     }
 
     private updateStop(rawSpeed: number | undefined, timeMs: number): void {
