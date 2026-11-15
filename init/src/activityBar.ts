@@ -64,7 +64,7 @@ function injectStyles(): void {
 export class ActivityBar {
     private readonly container: HTMLElement;
     private readonly fill: HTMLDivElement;
-    private readonly max: number;
+    readonly max: number;
     // needed for stop-function
     readonly threshold: number;
 

@@ -5,6 +5,7 @@ import {ActivityComments} from './activityComments';
 import {StopGame} from './stopGame';
 import {showScreen, currentScreen} from './screens';
 import { Tutorial } from './tutorial';
+import { Music } from './sounds';
 
 const video       = document.getElementById('video')        as HTMLVideoElement;
 const canvas      = document.getElementById('canvas')       as HTMLCanvasElement;
@@ -12,6 +13,9 @@ const ctx         = canvas.getContext('2d')                 as CanvasRenderingCo
 const motionValue = document.getElementById('motion-value') as HTMLDivElement;
 const startBtn    = document.getElementById('start')        as HTMLButtonElement;
 const introMsg    = document.getElementById('intro-msg')    as HTMLParagraphElement;
+const music       = new Music();
+// Vite hot reload: stop the old music before the new module starts its own
+import.meta.hot?.dispose(() => music.dispose());
 const activityBar = new ActivityBar(document.getElementById('activity-bar') as HTMLDivElement);
 const activityComments = new ActivityComments(
     document.getElementById('activity-comment') as HTMLDivElement,
@@ -20,6 +24,7 @@ const activityComments = new ActivityComments(
 
 const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDivElement, {
     threshold: activityBar.threshold,
+    onStop: () => music.stop(),
     // Hook for the evaluation screen
     onFinished: reactionTimeMs => {
         reactionResult = reactionTimeMs;
@@ -33,6 +38,10 @@ const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDiv
 const tutorial = new Tutorial(
     document.getElementById('tutorial-img') as HTMLImageElement,
     document.getElementById('tutorial-stop') as HTMLDivElement,
+    {
+        onMove: () => { music.setRate(1); music.play(); },
+        onStop: () => music.stop(),
+    },
 );
 
 let drawingUtils: DrawingUtils | undefined;
@@ -71,6 +80,8 @@ async function startGame() {
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
     motionMeter = new MotionMeter(video.videoWidth / video.videoHeight);
+    music.setIntensity(0, activityBar.max);
+    music.play();
     renderLoop();
 }
 
@@ -91,6 +102,7 @@ function renderLoop(): void {
         const intensity = motionMeter.update(poseLandmarkerResult.landmarks[0], startTimeMs);
         motionValue.textContent = intensity.toFixed(2);
         activityBar.update(intensity);
+        music.setIntensity(intensity, activityBar.max);
         activityComments.update(intensity, startTimeMs);
         stopGame.update(intensity, motionMeter.rawSpeed, startTimeMs);
 
