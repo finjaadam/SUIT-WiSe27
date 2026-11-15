@@ -114,8 +114,9 @@ function renderLoop(): void {
         motionValue.textContent = intensity.toFixed(2);
         activityBar.update(intensity);
         music.setIntensity(intensity, activityBar.max);
-        activityComments.update(intensity, startTimeMs);
         stopGame.update(intensity, motionMeter.rawSpeed, startTimeMs);
+        if (stopGame.isActive) activityComments.update(intensity, startTimeMs);
+        else activityComments.hide();
 
         lastVideoTime = video.currentTime;
     }
