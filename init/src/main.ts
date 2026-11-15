@@ -5,7 +5,7 @@ import {ActivityComments} from './activityComments';
 import {StopGame} from './stopGame';
 import {showScreen, currentScreen} from './screens';
 import { Tutorial } from './tutorial';
-import { Music } from './sounds';
+import { Music, sfx } from './sounds';
 
 const video       = document.getElementById('video')        as HTMLVideoElement;
 const canvas      = document.getElementById('canvas')       as HTMLCanvasElement;
@@ -24,9 +24,10 @@ const activityComments = new ActivityComments(
 
 const stopGame    = new StopGame(document.getElementById('stop-game') as HTMLDivElement, {
     threshold: activityBar.threshold,
-    onStop: () => music.stop(),
+    onStop: () => { music.stop(); sfx.stop.play(); },
     // Hook for the evaluation screen
     onFinished: reactionTimeMs => {
+        sfx.finished.play();
         reactionResult = reactionTimeMs;
         endGame();
         showScreen('auswertung');
@@ -41,6 +42,7 @@ const tutorial = new Tutorial(
     {
         onMove: () => { music.setRate(1); music.play(); },
         onStop: () => music.stop(),
+        onStopSign: () => sfx.stop.play(),
     },
 );
 
@@ -85,6 +87,7 @@ async function startGame() {
     canvas.height = video.videoHeight;
     motionMeter = new MotionMeter(video.videoWidth / video.videoHeight);
     music.setIntensity(0, activityBar.max);
+    sfx.start.play();
     music.play();
     gameStartMs = performance.now();
     renderLoop();
@@ -100,6 +103,8 @@ function renderLoop(): void {
 
     if (performance.now() - gameStartMs >= GAME_TIME_LIMIT_MS) {
         endGame();
+        music.stop();
+        sfx.timeUp.play();
         showScreen('zeitAbgelaufen');
         return;
     }
