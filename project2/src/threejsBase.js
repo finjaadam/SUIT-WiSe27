@@ -20,6 +20,11 @@ function main() {
     const plate = new THREE.Mesh(geometry, material);
     scene.add(plate);
 
+    const grid = new THREE.GridHelper(10, 10, 0xffffff, 0xffffff);
+    grid.scale.x = 1.5;
+    grid.position.y = 0.26; 
+    plate.add(grid);
+
     const light = new THREE.DirectionalLight(0xFFFFFF, 2.5);
     light.position.set(5, 10, 7);
     scene.add(light);
