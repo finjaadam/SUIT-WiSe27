@@ -27,13 +27,24 @@
         left: 24px;
         font-size: 24px;
       }
+
+      #base {
+        position: absolute;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        display: block;
+      }
     </style>
   </head>
   <body>
+    <!--
     <video id="video" autoplay playsinline muted hidden></video>
     <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
-
     <script type="module" src="/src/main.ts"></script>
+-->
+    <canvas id="base"></canvas>
+    <script type="module" src="/src/threejsBase.js"></script>
   </body>
 </html>
