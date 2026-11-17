@@ -28,8 +28,8 @@ function main() {
         defaultMaterial,
         defaultMaterial,
         {
-            friction: 0.4,    // Reibung
-            restitution: 0.2, // Elastizität
+            friction: 0.5,    // Reibung
+            restitution: 0.0, // Elastizität auf 0 gegen Hoppeln
         }
     );
     world.addContactMaterial(defaultContactMaterial);
@@ -39,35 +39,80 @@ function main() {
     const plateWidth = 15;
     const plateHeight = 0.5;
     const plateDepth = 10;
-    const geometry = new THREE.BoxGeometry(plateWidth, plateHeight, plateDepth);
+    const ballRadius = 0.5;
+    const holeRadius = 1.1;
+
+    const holes = [
+        { x:  0.0, z: -2.5, radius: holeRadius, type: 'trap', color: 0xff2222 },
+        { x: -4.2, z:  2.2, radius: holeRadius, type: 'trap', color: 0xff2222 },
+        { x:  4.2, z:  2.2, radius: holeRadius, type: 'goal', color: 0x22dd44 },
+    ];
+
+    const plateShape2D = new THREE.Shape();
+    plateShape2D.moveTo(-plateWidth / 2, -plateDepth / 2);
+    plateShape2D.lineTo( plateWidth / 2, -plateDepth / 2);
+    plateShape2D.lineTo( plateWidth / 2,  plateDepth / 2);
+    plateShape2D.lineTo(-plateWidth / 2,  plateDepth / 2);
+    plateShape2D.closePath();
+
+    holes.forEach(hole => {
+        const holePath = new THREE.Path();
+        holePath.absarc(hole.x, -hole.z, hole.radius, 0, Math.PI * 2, true);
+        plateShape2D.holes.push(holePath);
+    });
+
+    const geometry = new THREE.ExtrudeGeometry(plateShape2D, {
+        depth: plateHeight,
+        bevelEnabled: false,
+        curveSegments: 32,
+    });
+    geometry.rotateX(-Math.PI / 2);
+    geometry.translate(0, -plateHeight / 2, 0);
+
     const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
     const plate = new THREE.Mesh(geometry, material);
     scene.add(plate);
 
-    // Gitter passend zur Plattengröße (Three.js)
-    const grid = new THREE.GridHelper(10, 10, 0xffffff, 0xffffff);
-    grid.scale.x = plateWidth / plateDepth;
-    grid.position.y = (plateHeight / 2) + 0.01;
-    plate.add(grid);
+    holes.forEach(hole => {
+        const ringGeo = new THREE.RingGeometry(hole.radius, hole.radius + 0.2, 32);
+        ringGeo.rotateX(-Math.PI / 2);
+        const ringMat = new THREE.MeshBasicMaterial({ color: hole.color, side: THREE.DoubleSide });
+        const ring = new THREE.Mesh(ringGeo, ringMat);
+        ring.position.set(hole.x, (plateHeight / 2) + 0.01, hole.z);
+        plate.add(ring);
+    });
 
     // Plattform-Body (cannon-es)
-    const plateShape = new CANNON.Box(
-        new CANNON.Vec3(plateWidth / 2, plateHeight / 2, plateDepth / 2)
-    );
     const plateBody = new CANNON.Body({
         type: CANNON.Body.KINEMATIC,
-        shape: plateShape,
     });
+
+    function addPlateBox(minX, maxX, minZ, maxZ) {
+        const w = maxX - minX;
+        const d = maxZ - minZ;
+        const shape = new CANNON.Box(new CANNON.Vec3(w / 2, plateHeight / 2, d / 2));
+        plateBody.addShape(shape, new CANNON.Vec3(minX + w / 2, 0, minZ + d / 2));
+    }
+
+    const h = holeRadius * 0.78;
+    addPlateBox(-7.5,  7.5, -5.0, -2.5 - h);
+    addPlateBox(-7.5, -h,   -2.5 - h, -2.5 + h);
+    addPlateBox( h,    7.5, -2.5 - h, -2.5 + h);
+    addPlateBox(-7.5,  7.5, -2.5 + h,  2.2 - h);
+    addPlateBox(-7.5,      -4.2 - h,  2.2 - h,  2.2 + h);
+    addPlateBox(-4.2 + h,   4.2 - h,  2.2 - h,  2.2 + h);
+    addPlateBox( 4.2 + h,   7.5,      2.2 - h,  2.2 + h);
+    addPlateBox(-7.5,  7.5,  2.2 + h,  5.0);
+
     world.addBody(plateBody);
 
     // Ball (Three.js)
-    const ballRadius = 0.5;
     const ballGeometry = new THREE.SphereGeometry(ballRadius, 32, 32);
     const ballMaterial = new THREE.MeshPhongMaterial({color: 0xff5533});
     const ball = new THREE.Mesh(ballGeometry, ballMaterial);
     
     // Ball auf Platte setzen (Three.js)
-    ball.position.set(0, (plateHeight / 2) + ballRadius, 0);
+    ball.position.set(0, (plateHeight / 2) + ballRadius, 1);
     scene.add(ball);
 
     // Kugel-Body (cannon-es)
@@ -75,10 +120,17 @@ function main() {
     const ballBody = new CANNON.Body({
         mass: 1,
         shape: ballShape,
-        position: new CANNON.Vec3(0, 3, 0), 
-        angularDamping: 0.3, 
+        position: new CANNON.Vec3(0, 3, 1), 
+        linearDamping: 0.2,
+        angularDamping: 0.6, 
     });
     world.addBody(ballBody);
+
+    function resetBall() {
+        ballBody.position.set(0, 3, 1);
+        ballBody.velocity.set(0, 0, 0);
+        ballBody.angularVelocity.set(0, 0, 0);
+    }
 
     // Licht (Three.js)
     const light = new THREE.DirectionalLight(0xFFFFFF, 2.5);
@@ -120,7 +172,7 @@ function main() {
 
         plateBody.quaternion.setFromEuler(currentTilt.pitch, 0, currentTilt.roll);
 
-        world.step(1 / 60, deltaTime, 3);
+        world.step(1 / 120, deltaTime, 5);
 
         plate.position.copy(plateBody.position);
         plate.quaternion.copy(plateBody.quaternion);
@@ -129,10 +181,15 @@ function main() {
         ball.quaternion.copy(ballBody.quaternion);
 
         // Ball Reset
-        if (ballBody.position.y < -10) {
-            ballBody.position.set(0, 3, 0);
-            ballBody.velocity.set(0, 0, 0);
-            ballBody.angularVelocity.set(0, 0, 0);
+        if (ballBody.position.y < -2) {
+            const localBallPos = plate.worldToLocal(ball.position.clone());
+            const goalHole = holes.find(h => h.type === 'goal');
+            const distToGoal = Math.hypot(localBallPos.x - goalHole.x, localBallPos.z - goalHole.z);
+
+            if (distToGoal < goalHole.radius) {
+                console.log('Ziel erreicht');
+            }
+            resetBall();
         }
 
         renderer.render(scene, camera);
