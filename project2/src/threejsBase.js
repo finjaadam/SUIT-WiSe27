@@ -1,50 +1,41 @@
 import * as THREE from 'three';
-// Infos von: https://threejs.org/manual/#fundamentals
 
 function main() {
     const canvas = document.querySelector('#base');
     const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
 
-    const fov = 75;
-    const aspect = 2;  
+    const fov = 60; 
+    const aspect = window.innerWidth / window.innerHeight;  
     const near = 0.1;
-    const far = 100;
+    const far = 100; 
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.z = 10;
+    
+    camera.position.set(0, 8, 12);
+    camera.lookAt(0, 0, 0);
 
     const scene = new THREE.Scene();
 
-    const boxWidth = 15;
-    const boxHeight = 1;
-    const boxDepth = 10;
-    const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
-
+    const geometry = new THREE.BoxGeometry(15, 0.5, 10);
     const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
+    const plate = new THREE.Mesh(geometry, material);
+    scene.add(plate);
 
-    const cube = new THREE.Mesh(geometry, material);
-
-    scene.add(cube);
-
-    const color = 0xFFFFFF;
-    const intensity = 3;
-    const light = new THREE.DirectionalLight(color, intensity);
-    light.position.set(-1, 2, 4);
+    const light = new THREE.DirectionalLight(0xFFFFFF, 2.5);
+    light.position.set(5, 10, 7);
     scene.add(light);
 
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+    scene.add(ambientLight);
 
-    renderer.render(scene, camera);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
     function render(time) {
-        time *= 0.001;  // convert time to seconds
+        time *= 0.001;
         
-        cube.rotation.x = time;
-        cube.rotation.y = time;
+        plate.rotation.x = Math.sin(time) * 0.2;
+        plate.rotation.z = Math.cos(time) * 0.2;
         
         renderer.render(scene, camera);
-        
         requestAnimationFrame(render);
     }
     requestAnimationFrame(render);
