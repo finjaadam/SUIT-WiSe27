@@ -8,15 +8,15 @@ function main() {
     const fov = 75;
     const aspect = 2;  
     const near = 0.1;
-    const far = 5;
+    const far = 100;
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.z = 2;
+    camera.position.z = 10;
 
     const scene = new THREE.Scene();
 
-    const boxWidth = 1;
+    const boxWidth = 15;
     const boxHeight = 1;
-    const boxDepth = 1;
+    const boxDepth = 10;
     const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
     const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
