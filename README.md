@@ -7,28 +7,34 @@ Museumsanwendung mit Bodytracking zum Thema körperliche und geistige Fitness
 - Eine Webcam
 - Ein aktueller Browser (Chrome, Edge oder Firefox)
 
+## Aufbau
+
+Das Repo ist ein npm-Workspace: Alle Abhängigkeiten (MediaPipe, Vite, TypeScript) stehen in der `package.json` im Hauptverzeichnis und werden einmal gemeinsam installiert.
+
+| Ordner     | Inhalt                                                                 |
+|------------|------------------------------------------------------------------------|
+| `project1` | Interaktion 1                                                          |
+| `project2` | Interaktion 2                                                          |
+| `shared`   | Gemeinsam genutzt: Pose-Modell (`shared/models`) und `createPoseLandmarker()` (`shared/poseLandmarker.ts`) |
+
+Ebenfalls zentral im Hauptverzeichnis: `.gitignore` und `tsconfig.base.json`, die jedes Projekt per `extends` übernimmt. Die WASM-Dateien kommen direkt aus `@mediapipe/tasks-vision`.
+
 ## Projekt starten
 
-Die Abhängigkeiten liegen an zwei Stellen und müssen beide installiert werden:
-
-- `package.json` im Hauptverzeichnis: `@mediapipe/tasks-vision` (Bodytracking)
-- `init/package.json`: Vite und TypeScript (Dev-Server und Build)
-
 ```bash
-# 1. Abhängigkeiten im Hauptverzeichnis installieren (MediaPipe)
+# 1. Einmalig im Hauptverzeichnis alle Abhängigkeiten installieren
 npm install
 
-# 2. In die App wechseln und ihre Abhängigkeiten installieren (Vite, TypeScript)
-cd init
-npm install
-
-# 3. Dev-Server starten
-npm run dev
+# 2. Dev-Server eines Projekts starten
+npm run dev -w project1    # Interaktion 1
+npm run dev -w project2    # Interaktion 2
 ```
 
-Danach die Adresse öffnen, die Vite im Terminal ausgibt (meistens http://localhost:5173), und den Kamerazugriff im Browser erlauben. Das Kamerabild wird nicht angezeigt, nur das erkannte Skelett (Linien und Gelenkpunkte).
+Alternativ im jeweiligen Projektordner `npm run dev` ausführen.
 
-## Weitere Befehle (im Ordner `init`)
+Danach die Adresse öffnen, die Vite im Terminal ausgibt (meistens http://localhost:5173, laufen zwei Projekte gleichzeitig, bekommt das zweite den nächsten freien Port), und den Kamerazugriff im Browser erlauben. Das Kamerabild wird nicht angezeigt, nur das erkannte Skelett (Linien und Gelenkpunkte).
+
+## Weitere Befehle (mit `-w <projekt>` oder im Projektordner)
 
 | Befehl            | Beschreibung                                         |
 |-------------------|------------------------------------------------------|
@@ -36,11 +42,18 @@ Danach die Adresse öffnen, die Vite im Terminal ausgibt (meistens http://localh
 | `npm run build`   | Prüft die Typen mit `tsc` und baut die App nach `dist/` |
 | `npm run preview` | Startet einen lokalen Server für den gebauten Stand  |
 
+## Neues Projekt anlegen
+
+1. Ordner mit `index.html`, `src/`, `package.json` (Name und Skripte wie in `project2`) und `tsconfig.json` (`extends` auf `../tsconfig.base.json`) anlegen
+2. Ordner in der `package.json` im Hauptverzeichnis unter `workspaces` eintragen
+3. Im Hauptverzeichnis `npm install` ausführen
+
 ## Fehlerbehebung
 
 - **Kein Bild bzw. Skelett:** Prüfen, ob der Browser Zugriff auf die Kamera hat. `getUserMedia` funktioniert nur über `localhost` oder HTTPS.
-- **`Failed to resolve import "@mediapipe/tasks-vision"`:** `npm install` wurde im Hauptverzeichnis nicht ausgeführt (Schritt 1).
-- **Fehler beim Laden des Modells:** In der Browser-Konsole nach `KRITISCHER FEHLER` suchen. Die Dateien in `init/public/models` und `init/public/wasm` müssen vorhanden sein.
+- **`Failed to resolve import "@mediapipe/tasks-vision"` oder `vite` nicht gefunden:** `npm install` wurde im Hauptverzeichnis nicht ausgeführt (Schritt 1).
+- **Nach dem Wechsel auf die Workspace-Struktur:** Alte `node_modules`-Ordner im früheren Ordner `init` bzw. den Projektordnern löschen und im Hauptverzeichnis `npm install` ausführen.
+- **Fehler beim Laden des Modells:** Browser-Konsole prüfen. Das Modell muss in `shared/models` liegen.
 
 ## Soundeffekte
 ### Interaction 1
