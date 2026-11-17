@@ -17,16 +17,29 @@ function main() {
     const scene = new THREE.Scene();
 
     // Plattform
-    const geometry = new THREE.BoxGeometry(15, 0.5, 10);
+    const plateWidth = 15;
+    const plateHeight = 0.5;
+    const plateDepth = 10;
+    const geometry = new THREE.BoxGeometry(plateWidth, plateHeight, plateDepth);
     const material = new THREE.MeshPhongMaterial({color: 0x44aa88});
     const plate = new THREE.Mesh(geometry, material);
     scene.add(plate);
 
     // Gitter passend zur Plattengröße
     const grid = new THREE.GridHelper(10, 10, 0xffffff, 0xffffff);
-    grid.scale.x = 1.5;
-    grid.position.y = 0.26; 
+    grid.scale.x = plateWidth / plateDepth;
+    grid.position.y = (plateHeight / 2) + 0.01;
     plate.add(grid);
+
+    // Ball 
+    const ballRadius = 0.5;
+    const ballGeometry = new THREE.SphereGeometry(ballRadius, 32, 32);
+    const ballMaterial = new THREE.MeshPhongMaterial({color: 0xff5533});
+    const ball = new THREE.Mesh(ballGeometry, ballMaterial);
+    
+    // Ball auf Platte setzen
+    ball.position.set(0, (plateHeight / 2) + ballRadius, 0);
+    scene.add(ball);
 
     // Licht
     const light = new THREE.DirectionalLight(0xFFFFFF, 2.5);
