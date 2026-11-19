@@ -13,19 +13,26 @@
 
       #canvas {
         position: absolute;
-        inset: 0;
-        width: 100vw;
-        height: 100vh;
-        object-fit: cover;
-        /* Mirror the view so it behaves like a mirror */
+        top: 20px;
+        left: 20px;
+        width: 240px; 
+        height: 135px; 
+        background: rgba(0, 0, 0, 0.6); 
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: 8px;
+        z-index: 10; 
+        pointer-events: none; 
         transform: scaleX(-1);
       }
 
       #status {
         position: absolute;
         top: 24px;
-        left: 24px;
-        font-size: 24px;
+        left: 32px;
+        margin: 0;
+        font-size: 14px;
+        color: white;
+        z-index: 11;
       }
 
       #base {
@@ -34,12 +41,14 @@
         width: 100vw;
         height: 100vh;
         display: block;
+        z-index: 1;
       }
 
       #controls {
         position: absolute;
-        top: 20px;
+        top: 170px;
         left: 20px;
+        width: 208px; 
         background: rgba(0, 0, 0, 0.7);
         color: white;
         padding: 16px;
@@ -58,12 +67,11 @@
     </style>
   </head>
   <body>
-    <!--
+    
     <video id="video" autoplay playsinline muted hidden></video>
     <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
-    <script type="module" src="/src/main.ts"></script>
--->
+        
     <div id="controls">
       <div class="control-group">
         <label for="tiltX">Vor / Zurück (Pitch): <span id="valX">0</span>°</label>
@@ -76,6 +84,8 @@
     </div>
 
     <canvas id="base"></canvas>
+
+    <script type="module" src="/src/main.ts"></script>
     <script type="module" src="/src/threejsBase.js"></script>
   </body>
 </html>
