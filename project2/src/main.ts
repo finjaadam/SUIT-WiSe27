@@ -36,8 +36,15 @@ function renderLoop(): void {
 function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (!landmarks) return;
-    drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, {color: '#00FF00', lineWidth: 4});
-    drawingUtils.drawLandmarks(landmarks, {color: '#FF0000', fillColor: '#FF0000', radius: 6});
+    drawingUtils.drawConnectors(landmarks, PoseLandmarker.POSE_CONNECTIONS, {
+        color: '#00FF00', 
+        lineWidth: 8 
+    });
+    drawingUtils.drawLandmarks(landmarks, {
+        color: '#FF0000', 
+        fillColor: '#FF0000', 
+        radius: 10 
+    });
 }
 
 init().catch(err => {
