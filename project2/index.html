@@ -25,7 +25,53 @@
         position: absolute;
         top: 24px;
         left: 24px;
+        z-index: 2;
         font-size: 24px;
+      }
+
+      [data-screen] {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        text-align: center;
+        pointer-events: none;
+      }
+
+      [data-screen][hidden] {
+        display: none;
+      }
+
+      [data-screen] h1 {
+        margin: 0;
+        padding: 16px 32px;
+        font-size: 8vh;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+      }
+
+      #start-hint {
+        min-height: 1.2em;
+        margin: 0;
+        font-size: 3.5vh;
+      }
+
+      #start-progress-track {
+        width: 40vw;
+        height: 3vh;
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      #start-progress {
+        width: 0;
+        height: 100%;
+        background: #265cc0;
       }
     </style>
   </head>
@@ -33,6 +79,17 @@
     <video id="video" autoplay playsinline muted hidden></video>
     <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
+
+    <section data-screen="start">
+      <h1>Stell dich auf ein Bein</h1>
+      <div id="start-progress-track"><div id="start-progress"></div></div>
+      <p id="start-hint"></p>
+    </section>
+
+    <!-- Placeholder -->
+    <section data-screen="intro" hidden>
+      <h1>Gleich geht's los!</h1>
+    </section>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
