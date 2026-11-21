@@ -4,25 +4,31 @@ const LEFT_SHOULDER  = 11;
 const RIGHT_SHOULDER = 12;
 const LEFT_HIP       = 23;
 const RIGHT_HIP      = 24;
+const LEFT_KNEE      = 25;
+const RIGHT_KNEE     = 26;
 const LEFT_ANKLE     = 27;
 const RIGHT_ANKLE    = 28;
-const REQUIRED = [LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_HIP, RIGHT_HIP, LEFT_ANKLE, RIGHT_ANKLE];
+const REQUIRED = [LEFT_SHOULDER, RIGHT_SHOULDER, LEFT_HIP, RIGHT_HIP, LEFT_KNEE, RIGHT_KNEE];
 
 const MIN_VISIBILITY = 0.5;
 // Smaller torsos (fraction of image height) are measurement errors
 const MIN_TORSO = 0.05;
-// Height difference between the ankles, in torso lengths, from which one foot counts as lifted
-const MIN_LIFT = 0.3;
+// Height differences in torso lengths from which a leg counts as lifted:
+// the ankle for a foot bent back, the knee for a leg lifted forward
+const MIN_ANKLE_LIFT = 0.3;
+const MIN_KNEE_LIFT  = 0.2;
+// Once on one leg, smaller lifts still count, so values around the threshold do not flicker
+const KEEP_FACTOR = 0.7;
 const HOLD_MS = 3000;
 // Short tracking dropouts within this time do not reset the hold
-const GRACE_MS = 300;
+const GRACE_MS = 500;
 
 export type Posture = 'notVisible' | 'twoLegs' | 'oneLeg';
 
 /**
- * Detects a person standing on one leg (either leg): one ankle is clearly
- * higher than the other, relative to the torso length so the distance to the
- * camera does not matter.
+ * Detects a person standing on one leg (either leg): one knee or one ankle is
+ * clearly higher than the other, relative to the torso length so the distance
+ * to the camera does not matter.
  */
 export class OneLegStand {
     posture: Posture = 'notVisible';
@@ -32,7 +38,7 @@ export class OneLegStand {
 
     /** Returns how long the pose has been held, from 0 to 1 (= long enough) */
     update(landmarks: NormalizedLandmark[] | undefined, timeMs: number): number {
-        this.posture = detectPosture(landmarks);
+        this.posture = detectPosture(landmarks, this.posture === 'oneLeg' ? KEEP_FACTOR : 1);
 
         if (this.posture === 'oneLeg') {
             this.holdStartMs ??= timeMs;
@@ -46,7 +52,7 @@ export class OneLegStand {
     }
 }
 
-function detectPosture(landmarks: NormalizedLandmark[] | undefined): Posture {
+function detectPosture(landmarks: NormalizedLandmark[] | undefined, thresholdFactor: number): Posture {
     if (!landmarks || REQUIRED.some(i => landmarks[i].visibility < MIN_VISIBILITY)) return 'notVisible';
 
     const shoulderY = (landmarks[LEFT_SHOULDER].y + landmarks[RIGHT_SHOULDER].y) / 2;
@@ -54,6 +60,15 @@ function detectPosture(landmarks: NormalizedLandmark[] | undefined): Posture {
     const torso     = hipY - shoulderY;
     if (torso < MIN_TORSO) return 'notVisible';
 
-    const lift = Math.abs(landmarks[LEFT_ANKLE].y - landmarks[RIGHT_ANKLE].y) / torso;
-    return lift >= MIN_LIFT ? 'oneLeg' : 'twoLegs';
+    const kneeLift = heightDifference(landmarks[LEFT_KNEE], landmarks[RIGHT_KNEE]) / torso;
+    if (kneeLift >= MIN_KNEE_LIFT * thresholdFactor) return 'oneLeg';
+
+    const ankleLift = heightDifference(landmarks[LEFT_ANKLE], landmarks[RIGHT_ANKLE]) / torso;
+    return ankleLift >= MIN_ANKLE_LIFT * thresholdFactor ? 'oneLeg' : 'twoLegs';
+}
+
+/** 0 if one of the points is not visible */
+function heightDifference(a: NormalizedLandmark, b: NormalizedLandmark): number {
+    if (a.visibility < MIN_VISIBILITY || b.visibility < MIN_VISIBILITY) return 0;
+    return Math.abs(a.y - b.y);
 }
