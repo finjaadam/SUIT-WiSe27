@@ -34,7 +34,7 @@
       /* From the intro on the board fills the screen, the skeleton moves to a small corner view */
       body[data-screen="intro"] #canvas {
         inset: auto;
-        top: 20px;
+        bottom: 20px;
         left: 20px;
         width: 240px;
         height: 135px;
@@ -45,6 +45,8 @@
       }
 
       body[data-screen="intro"] #status {
+        top: auto;
+        bottom: 132px;
         left: 32px;
         font-size: 14px;
         z-index: 11;
@@ -59,28 +61,6 @@
         z-index: 1;
       }
 
-      #controls {
-        position: absolute;
-        top: 170px;
-        left: 20px;
-        width: 208px; 
-        background: rgba(0, 0, 0, 0.7);
-        color: white;
-        padding: 16px;
-        border-radius: 8px;
-        display: flex;
-        flex-direction: column;
-        gap: 12px;
-        z-index: 10;
-        /* Screens ignore the mouse, the sliders must not */
-        pointer-events: auto;
-      }
-
-      .control-group {
-        display: flex;
-        flex-direction: column;
-        gap: 4px;
-      }
 
       [data-screen] {
         position: absolute;
@@ -121,6 +101,25 @@
         overflow: hidden;
       }
 
+      [data-screen="intro"] {
+        justify-content: flex-start;
+        padding-top: 24px;
+      }
+
+      /* Above the board */
+      [data-screen="intro"] h1 {
+        position: relative;
+        z-index: 2;
+      }
+
+      #cat {
+        position: absolute;
+        right: 4vw;
+        bottom: 0;
+        height: 65vh;
+        z-index: 2;
+      }
+
       #start-progress {
         width: 0;
         height: 100%;
@@ -143,20 +142,10 @@
     <!-- Board only appears once the one-leg stand was recognized -->
     <section data-screen="intro" hidden>
       <canvas id="base"></canvas>
-
-      <div id="controls">
-        <div class="control-group">
-          <label for="tiltX">Vor / Zurück (Pitch): <span id="valX">0</span>°</label>
-          <input type="range" id="tiltX" min="-0.35" max="0.35" step="0.01" value="0" />
-        </div>
-        <div class="control-group">
-          <label for="tiltZ">Links / Rechts (Roll): <span id="valZ">0</span>°</label>
-          <input type="range" id="tiltZ" min="-0.35" max="0.35" step="0.01" value="0" />
-        </div>
-      </div>
+      <h1>Neige deinen Oberkörper um das Brett zu steuern</h1>
+      <img id="cat" src="img/cat_intro.gif" alt="Katze auf einem Bein neigt den Oberkörper nach vorne, hinten, links und rechts">
     </section>
 
     <script type="module" src="/src/main.ts"></script>
-    <script type="module" src="/src/threejsBase.js"></script>
   </body>
 </html>

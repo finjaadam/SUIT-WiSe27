@@ -1,6 +1,14 @@
 import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 
+const targetTilt = { pitch: 0, roll: 0 };
+
+export function setBoardTilt({forward, left}) {
+    const MAX_TILT = 0.25;
+    targetTilt.pitch = forward * MAX_TILT;
+    targetTilt.roll  = left * MAX_TILT;
+}
+
 function main() {
     const canvas = document.querySelector('#base');
     const renderer = new THREE.WebGLRenderer({antialias: true, canvas});
@@ -140,24 +148,7 @@ function main() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
     scene.add(ambientLight);
 
-    // Input (später durch MediaPipe ersetzen) 
-    const targetTilt = { pitch: 0, roll: 0 };
     const currentTilt = { pitch: 0, roll: 0 };
-
-    const sliderX = document.getElementById('tiltX');
-    const sliderZ = document.getElementById('tiltZ');
-    const valX = document.getElementById('valX');
-    const valZ = document.getElementById('valZ');
-
-    sliderX.addEventListener('input', (e) => {
-        targetTilt.pitch = parseFloat(e.target.value);
-        valX.textContent = Math.round(targetTilt.pitch * (180 / Math.PI));
-    });
-
-    sliderZ.addEventListener('input', (e) => {
-        targetTilt.roll = -parseFloat(e.target.value);
-        valZ.textContent = Math.round(parseFloat(e.target.value) * (180 / Math.PI));
-    });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
