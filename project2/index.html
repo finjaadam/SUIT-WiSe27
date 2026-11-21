@@ -17,6 +17,7 @@
         width: 100vw;
         height: 100vh;
         object-fit: cover;
+        pointer-events: none;
         /* Mirror the view so it behaves like a mirror */
         transform: scaleX(-1);
       }
@@ -25,8 +26,60 @@
         position: absolute;
         top: 24px;
         left: 24px;
-        z-index: 2;
+        margin: 0;
         font-size: 24px;
+        z-index: 2;
+      }
+
+      /* From the intro on the board fills the screen, the skeleton moves to a small corner view */
+      body[data-screen="intro"] #canvas {
+        inset: auto;
+        top: 20px;
+        left: 20px;
+        width: 240px;
+        height: 135px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        z-index: 10;
+      }
+
+      body[data-screen="intro"] #status {
+        left: 32px;
+        font-size: 14px;
+        z-index: 11;
+      }
+
+      #base {
+        position: absolute;
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        display: block;
+        z-index: 1;
+      }
+
+      #controls {
+        position: absolute;
+        top: 170px;
+        left: 20px;
+        width: 208px; 
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 16px;
+        border-radius: 8px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        z-index: 10;
+        /* Screens ignore the mouse, the sliders must not */
+        pointer-events: auto;
+      }
+
+      .control-group {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
       }
 
       [data-screen] {
@@ -76,21 +129,34 @@
     </style>
   </head>
   <body>
+    
     <video id="video" autoplay playsinline muted hidden></video>
     <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
-
+        
     <section data-screen="start">
       <h1>Stell dich auf ein Bein</h1>
       <div id="start-progress-track"><div id="start-progress"></div></div>
       <p id="start-hint"></p>
     </section>
 
-    <!-- Placeholder -->
+    <!-- Board only appears once the one-leg stand was recognized -->
     <section data-screen="intro" hidden>
-      <h1>Gleich geht's los!</h1>
+      <canvas id="base"></canvas>
+
+      <div id="controls">
+        <div class="control-group">
+          <label for="tiltX">Vor / Zurück (Pitch): <span id="valX">0</span>°</label>
+          <input type="range" id="tiltX" min="-0.35" max="0.35" step="0.01" value="0" />
+        </div>
+        <div class="control-group">
+          <label for="tiltZ">Links / Rechts (Roll): <span id="valZ">0</span>°</label>
+          <input type="range" id="tiltZ" min="-0.35" max="0.35" step="0.01" value="0" />
+        </div>
+      </div>
     </section>
 
     <script type="module" src="/src/main.ts"></script>
+    <script type="module" src="/src/threejsBase.js"></script>
   </body>
 </html>
