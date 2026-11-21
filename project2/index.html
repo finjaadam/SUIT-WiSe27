@@ -13,25 +13,40 @@
 
       #canvas {
         position: absolute;
-        top: 20px;
-        left: 20px;
-        width: 240px; 
-        height: 135px; 
-        background: rgba(0, 0, 0, 0.6); 
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: 8px;
-        z-index: 10; 
-        pointer-events: none; 
+        inset: 0;
+        width: 100vw;
+        height: 100vh;
+        object-fit: cover;
+        pointer-events: none;
+        /* Mirror the view so it behaves like a mirror */
         transform: scaleX(-1);
       }
 
       #status {
         position: absolute;
         top: 24px;
-        left: 32px;
+        left: 24px;
         margin: 0;
+        font-size: 24px;
+        z-index: 2;
+      }
+
+      /* From the intro on the board fills the screen, the skeleton moves to a small corner view */
+      body[data-screen="intro"] #canvas {
+        inset: auto;
+        top: 20px;
+        left: 20px;
+        width: 240px;
+        height: 135px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        z-index: 10;
+      }
+
+      body[data-screen="intro"] #status {
+        left: 32px;
         font-size: 14px;
-        color: white;
         z-index: 11;
       }
 
@@ -57,12 +72,59 @@
         flex-direction: column;
         gap: 12px;
         z-index: 10;
+        /* Screens ignore the mouse, the sliders must not */
+        pointer-events: auto;
       }
 
       .control-group {
         display: flex;
         flex-direction: column;
         gap: 4px;
+      }
+
+      [data-screen] {
+        position: absolute;
+        inset: 0;
+        z-index: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 24px;
+        text-align: center;
+        pointer-events: none;
+      }
+
+      [data-screen][hidden] {
+        display: none;
+      }
+
+      [data-screen] h1 {
+        margin: 0;
+        padding: 16px 32px;
+        font-size: 8vh;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+      }
+
+      #start-hint {
+        min-height: 1.2em;
+        margin: 0;
+        font-size: 3.5vh;
+      }
+
+      #start-progress-track {
+        width: 40vw;
+        height: 3vh;
+        background: rgba(0, 0, 0, 0.15);
+        border-radius: 999px;
+        overflow: hidden;
+      }
+
+      #start-progress {
+        width: 0;
+        height: 100%;
+        background: #265cc0;
       }
     </style>
   </head>
@@ -72,18 +134,27 @@
     <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
         
-    <div id="controls">
-      <div class="control-group">
-        <label for="tiltX">Vor / Zurück (Pitch): <span id="valX">0</span>°</label>
-        <input type="range" id="tiltX" min="-0.35" max="0.35" step="0.01" value="0" />
-      </div>
-      <div class="control-group">
-        <label for="tiltZ">Links / Rechts (Roll): <span id="valZ">0</span>°</label>
-        <input type="range" id="tiltZ" min="-0.35" max="0.35" step="0.01" value="0" />
-      </div>
-    </div>
+    <section data-screen="start">
+      <h1>Stell dich auf ein Bein</h1>
+      <div id="start-progress-track"><div id="start-progress"></div></div>
+      <p id="start-hint"></p>
+    </section>
 
-    <canvas id="base"></canvas>
+    <!-- Board only appears once the one-leg stand was recognized -->
+    <section data-screen="intro" hidden>
+      <canvas id="base"></canvas>
+
+      <div id="controls">
+        <div class="control-group">
+          <label for="tiltX">Vor / Zurück (Pitch): <span id="valX">0</span>°</label>
+          <input type="range" id="tiltX" min="-0.35" max="0.35" step="0.01" value="0" />
+        </div>
+        <div class="control-group">
+          <label for="tiltZ">Links / Rechts (Roll): <span id="valZ">0</span>°</label>
+          <input type="range" id="tiltZ" min="-0.35" max="0.35" step="0.01" value="0" />
+        </div>
+      </div>
+    </section>
 
     <script type="module" src="/src/main.ts"></script>
     <script type="module" src="/src/threejsBase.js"></script>
