@@ -4,6 +4,9 @@ import type {Lean} from './threejsBase.js';
 const STEP_MS = 2100;
 const DIRECTIONS: Lean[] = [{forward: 1, left: 0}, {forward: -1, left: 0}, {forward: 0, left: 1}, {forward: 0, left: -1}];
 
+/** Once the cat has leaned in every direction the intro is over */
+export const INTRO_MS = DIRECTIONS.length * STEP_MS;
+
 /** Lean of the cat at the given time since the GIF started, the board eases into it by itself */
 export function catLeanAt(ms: number): Lean {
     const t = ms % STEP_MS;
