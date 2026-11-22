@@ -4,9 +4,14 @@ import * as CANNON from 'cannon-es';
 const targetTilt = { pitch: 0, roll: 0 };
 // Set by main() once the physics world exists
 let resetBallInWorld = () => {};
+let onGoalCallback = () => {};
 
 export function resetBall() {
     resetBallInWorld();
+}
+
+export function onGoalReached(callback) {
+    onGoalCallback = callback;
 }
 
 export function setBoardTilt({forward, left}) {
@@ -87,6 +92,9 @@ function main() {
     const plate = new THREE.Mesh(geometry, material);
     scene.add(plate);
 
+    let goalTriggered = false;
+    let goalRingMesh = null;
+
     holes.forEach(hole => {
         const ringGeo = new THREE.RingGeometry(hole.radius, hole.radius + 0.2, 32);
         ringGeo.rotateX(-Math.PI / 2);
@@ -94,6 +102,10 @@ function main() {
         const ring = new THREE.Mesh(ringGeo, ringMat);
         ring.position.set(hole.x, (plateHeight / 2) + 0.01, hole.z);
         plate.add(ring);
+
+        if (hole.type === 'goal') {
+            goalRingMesh = ring;
+        }
     });
 
     // Plattform-Body (cannon-es)
@@ -144,6 +156,10 @@ function main() {
         ballBody.position.set(0, 3, 1);
         ballBody.velocity.set(0, 0, 0);
         ballBody.angularVelocity.set(0, 0, 0);
+        goalTriggered = false;
+        if (goalRingMesh) {
+            goalRingMesh.material.color.setHex(0x22dd44);
+        }
     }
     resetBallInWorld = resetBall;
 
@@ -180,14 +196,25 @@ function main() {
 
         // Ball Reset
         if (ballBody.position.y < -2) {
+            // Prüfen, sobald der Ball unter die Plattenoberfläche taucht
             const localBallPos = plate.worldToLocal(ball.position.clone());
-            const goalHole = holes.find(h => h.type === 'goal');
-            const distToGoal = Math.hypot(localBallPos.x - goalHole.x, localBallPos.z - goalHole.z);
+            if (!goalTriggered && localBallPos.y < -0.1) {
+                const goalHole = holes.find(h => h.type === 'goal');
+                const distToGoal = Math.hypot(localBallPos.x - goalHole.x, localBallPos.z - goalHole.z);
 
-            if (distToGoal < goalHole.radius) {
-                console.log('Ziel erreicht');
+                if (distToGoal < goalHole.radius) {
+                    goalTriggered = true;
+                    if (goalRingMesh) {
+                        goalRingMesh.material.color.setHex(0xffffff); // Ring blitzt kurz hell auf
+                    }
+                    onGoalCallback();
+                }
             }
-            resetBall();
+
+            // Ball Reset
+            if (ballBody.position.y < -2) {
+                resetBall();
+            }
         }
 
         renderer.render(scene, camera);
