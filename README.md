@@ -11,10 +11,10 @@ Museumsanwendung mit Bodytracking zum Thema körperliche und geistige Fitness
 
 Das Repo ist ein npm-Workspace: Alle Abhängigkeiten (MediaPipe, Vite, TypeScript) stehen in der `package.json` im Hauptverzeichnis und werden einmal gemeinsam installiert.
 
-| Ordner     | Inhalt                                                                 |
-|------------|------------------------------------------------------------------------|
-| `project1` | Interaktion 1                                                          |
-| `project2` | Interaktion 2                                                          |
+| Ordner     | Inhalt                                                                                                     |
+|------------|------------------------------------------------------------------------------------------------------------|
+| `project1` | Interaktion 1                                                                                              |
+| `project2` | Interaktion 2                                                                                              |
 | `shared`   | Gemeinsam genutzt: Pose-Modell (`shared/models`) und `createPoseLandmarker()` (`shared/poseLandmarker.ts`) |
 
 Ebenfalls zentral im Hauptverzeichnis: `.gitignore` und `tsconfig.base.json`, die jedes Projekt per `extends` übernimmt. Die WASM-Dateien kommen direkt aus `@mediapipe/tasks-vision`.
