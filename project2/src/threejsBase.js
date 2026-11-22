@@ -5,6 +5,7 @@ const targetTilt = { pitch: 0, roll: 0 };
 // Set by main() once the physics world exists
 let resetBallInWorld = () => {};
 let onGoalCallback = () => {};
+let onTrapCallback = () => {};
 
 export function resetBall() {
     resetBallInWorld();
@@ -12,6 +13,10 @@ export function resetBall() {
 
 export function onGoalReached(callback) {
     onGoalCallback = callback;
+}
+
+export function onTrapReached(callback) {
+    onTrapCallback = callback;
 }
 
 export function setBoardTilt({forward, left}) {
@@ -92,7 +97,7 @@ function main() {
     const plate = new THREE.Mesh(geometry, material);
     scene.add(plate);
 
-    let goalTriggered = false;
+    let holeTriggered = false;
     let goalRingMesh = null;
 
     holes.forEach(hole => {
@@ -156,7 +161,7 @@ function main() {
         ballBody.position.set(0, 3, 1);
         ballBody.velocity.set(0, 0, 0);
         ballBody.angularVelocity.set(0, 0, 0);
-        goalTriggered = false;
+        holeTriggered = false;
         if (goalRingMesh) {
             goalRingMesh.material.color.setHex(0x22dd44);
         }
@@ -176,10 +181,11 @@ function main() {
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     // Render- und Physik-Loop
-    const clock = new THREE.Clock();
+    const timer = new THREE.Timer();
 
-    function render() {
-        const deltaTime = Math.min(clock.getDelta(), 0.1); 
+    function render(timestamp) {
+        timer.update(timestamp);
+        const deltaTime = Math.min(timer.getDelta(), 0.1); 
 
         currentTilt.pitch += (targetTilt.pitch - currentTilt.pitch) * 0.1;
         currentTilt.roll += (targetTilt.roll - currentTilt.roll) * 0.1;
@@ -194,27 +200,30 @@ function main() {
         ball.position.copy(ballBody.position);
         ball.quaternion.copy(ballBody.quaternion);
 
-        // Ball Reset
-        if (ballBody.position.y < -2) {
-            // Prüfen, sobald der Ball unter die Plattenoberfläche taucht
-            const localBallPos = plate.worldToLocal(ball.position.clone());
-            if (!goalTriggered && localBallPos.y < -0.1) {
-                const goalHole = holes.find(h => h.type === 'goal');
-                const distToGoal = Math.hypot(localBallPos.x - goalHole.x, localBallPos.z - goalHole.z);
+        // Prüfen, sobald der Ball unter die Plattenoberfläche taucht
+        const localBallPos = plate.worldToLocal(ball.position.clone());
+        if (!holeTriggered && localBallPos.y < -0.1) {
+            const hitHole = holes.find(h => {
+                const dist = Math.hypot(localBallPos.x - h.x, localBallPos.z - h.z);
+                return dist < h.radius;
+            });
 
-                if (distToGoal < goalHole.radius) {
-                    goalTriggered = true;
+            if (hitHole) {
+                holeTriggered = true;
+                if (hitHole.type === 'goal') {
                     if (goalRingMesh) {
                         goalRingMesh.material.color.setHex(0xffffff); // Ring blitzt kurz hell auf
                     }
                     onGoalCallback();
+                } else if (hitHole.type === 'trap') {
+                    onTrapCallback();
                 }
             }
+        }
 
-            // Ball Reset
-            if (ballBody.position.y < -2) {
-                resetBall();
-            }
+        // Ball Reset
+        if (ballBody.position.y < -2) {
+            resetBall();
         }
 
         renderer.render(scene, camera);
