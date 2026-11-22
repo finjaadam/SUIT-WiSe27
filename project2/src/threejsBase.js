@@ -2,6 +2,12 @@ import * as THREE from 'three';
 import * as CANNON from 'cannon-es';
 
 const targetTilt = { pitch: 0, roll: 0 };
+// Set by main() once the physics world exists
+let resetBallInWorld = () => {};
+
+export function resetBall() {
+    resetBallInWorld();
+}
 
 export function setBoardTilt({forward, left}) {
     const MAX_TILT = 0.25;
@@ -139,6 +145,7 @@ function main() {
         ballBody.velocity.set(0, 0, 0);
         ballBody.angularVelocity.set(0, 0, 0);
     }
+    resetBallInWorld = resetBall;
 
     // Licht (Three.js)
     const light = new THREE.DirectionalLight(0xFFFFFF, 2.5);
