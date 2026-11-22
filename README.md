@@ -9,7 +9,9 @@ Museumsanwendung mit Bodytracking zum Thema körperliche und geistige Fitness
 
 ## Aufbau
 
-Das Repo ist ein npm-Workspace: Alle Abhängigkeiten (MediaPipe, Vite, TypeScript) stehen in der `package.json` im Hauptverzeichnis und werden einmal gemeinsam installiert.
+Das Repo ist ein npm-Workspace: Alle Abhängigkeiten (MediaPipe, three.js, cannon-es, Vite, TypeScript) stehen in der `package.json` im Hauptverzeichnis und werden einmal gemeinsam nach `node_modules` im Hauptverzeichnis installiert. Die `package.json` der Projekte enthalten nur Name und Skripte.
+
+**Neue Abhängigkeit hinzufügen:** Immer im Hauptverzeichnis und ohne `-w`, z. B. `npm install paketname` (bzw. `npm install -D paketname` für Dev-Tools). Nicht im Projektordner installieren, sonst landet das Paket in der `package.json` des Projekts und die Versionen laufen auseinander.
 
 | Ordner     | Inhalt                                                                                                     |
 |------------|------------------------------------------------------------------------------------------------------------|
@@ -51,7 +53,8 @@ Danach die Adresse öffnen, die Vite im Terminal ausgibt (meistens http://localh
 ## Fehlerbehebung
 
 - **Kein Bild bzw. Skelett:** Prüfen, ob der Browser Zugriff auf die Kamera hat. `getUserMedia` funktioniert nur über `localhost` oder HTTPS.
-- **`Failed to resolve import "@mediapipe/tasks-vision"` oder `vite` nicht gefunden:** `npm install` wurde im Hauptverzeichnis nicht ausgeführt (Schritt 1).
+- **`Failed to resolve import "…"` (z. B. `three`, `cannon-es`, `@mediapipe/tasks-vision`) oder `vite` nicht gefunden:** Im Hauptverzeichnis `npm install` ausführen (Schritt 1), z. B. nach einem `git pull`, der neue Abhängigkeiten mitbringt. Steht das Paket noch gar nicht in der `package.json` im Hauptverzeichnis, siehe „Neue Abhängigkeit hinzufügen“.
+- **Warnung `Some chunks are larger than 500 kB`** beim Build von `project2`: harmlos, three.js ist einfach groß. Der Build ist trotzdem erfolgreich.
 - **Nach dem Wechsel auf die Workspace-Struktur:** Alte `node_modules`-Ordner im früheren Ordner `init` bzw. den Projektordnern löschen und im Hauptverzeichnis `npm install` ausführen.
 - **Fehler beim Laden des Modells:** Browser-Konsole prüfen. Das Modell muss in `shared/models` liegen.
 
