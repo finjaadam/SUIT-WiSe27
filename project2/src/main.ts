@@ -1,9 +1,11 @@
-import {DrawingUtils, PoseLandmarker, type NormalizedLandmark} from '@mediapipe/tasks-vision';
+import {DrawingUtils, PoseLandmarker, type Landmark, type NormalizedLandmark} from '@mediapipe/tasks-vision';
 import {createPoseLandmarker} from '../../shared/poseLandmarker';
-import {catLeanAt} from './catLean';
+import {BodyLean} from './bodyLean';
+import {catLeanAt, INTRO_MS} from './catLean';
+import {LeanDebug} from './leanDebug';
 import {OneLegStand} from './oneLegStand';
 import {currentScreen, showScreen} from './screens';
-import {setBoardTilt} from './threejsBase.js';
+import {resetBall, setBoardTilt} from './threejsBase.js';
 
 const video         = document.getElementById('video')          as HTMLVideoElement;
 const canvas        = document.getElementById('canvas')         as HTMLCanvasElement;
@@ -13,9 +15,12 @@ const startProgress = document.getElementById('start-progress') as HTMLDivElemen
 const ctx           = canvas.getContext('2d')!;
 const drawingUtils  = new DrawingUtils(ctx);
 const oneLegStand   = new OneLegStand();
+const bodyLean      = new BodyLean();
 const catImage      = document.getElementById('cat')            as HTMLImageElement;
+const gameHint      = document.getElementById('game-hint')      as HTMLHeadingElement;
 
 let poseLandmarker: PoseLandmarker;
+let leanDebug: LeanDebug;
 let lastVideoTime = -1;
 // The start screen stays visible while the intro GIF loads, so start it only once
 let introStarted = false;
@@ -30,6 +35,7 @@ async function init(): Promise<void> {
     await video.play();
     canvas.width  = video.videoWidth;
     canvas.height = video.videoHeight;
+    leanDebug = new LeanDebug(document.getElementById('lean-debug')!, video.videoWidth / video.videoHeight);
 
     status.textContent = '';
     renderLoop();
@@ -39,12 +45,13 @@ function renderLoop(): void {
     if (video.currentTime !== lastVideoTime) {
         lastVideoTime = video.currentTime;
         const timeMs    = performance.now();
-        const landmarks = poseLandmarker.detectForVideo(video, timeMs).landmarks[0];
+        const result    = poseLandmarker.detectForVideo(video, timeMs);
+        const landmarks = result.landmarks[0];
 
         drawSkeleton(landmarks);
         if (currentScreen === 'start') updateStartScreen(landmarks, timeMs);
-        // Later the game passes the player's upper body lean here instead
-        if (currentScreen === 'intro') setBoardTilt(catLeanAt(timeMs - introStartMs));
+        if (currentScreen === 'intro') updateIntro(timeMs);
+        if (currentScreen === 'spiel') updateGame(landmarks, result.worldLandmarks[0], timeMs);
     }
     requestAnimationFrame(renderLoop);
 }
@@ -70,6 +77,27 @@ async function startIntro(): Promise<void> {
     await catImage.decode().catch(() => {});
     showScreen('intro');
     introStartMs = performance.now();
+}
+
+function startGame(timeMs: number): void {
+    // The ball rolled around during the intro
+    resetBall();
+    bodyLean.calibrate(timeMs);
+    showScreen('spiel');
+}
+
+function updateGame(landmarks: NormalizedLandmark[] | undefined, worldLandmarks: Landmark[] | undefined, timeMs: number): void {
+    // The board stays flat until the player's upright posture is known
+    setBoardTilt(bodyLean.update(worldLandmarks, timeMs));
+    gameHint.hidden = !bodyLean.isCalibrating;
+    leanDebug.update(landmarks, worldLandmarks, bodyLean.isCalibrating);
+}
+
+/** The cat shows how to steer, afterwards the player takes over the board */
+function updateIntro(timeMs: number): void {
+    const introMs = timeMs - introStartMs;
+    if (introMs < INTRO_MS) setBoardTilt(catLeanAt(introMs));
+    else startGame(timeMs);
 }
 
 function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {

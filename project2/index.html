@@ -32,7 +32,7 @@
       }
 
       /* From the intro on the board fills the screen, the skeleton moves to a small corner view */
-      body[data-screen="intro"] #canvas {
+      body:is([data-screen="intro"], [data-screen="spiel"]) #canvas {
         inset: auto;
         bottom: 20px;
         left: 20px;
@@ -44,12 +44,29 @@
         z-index: 10;
       }
 
-      body[data-screen="intro"] #status {
+      body:is([data-screen="intro"], [data-screen="spiel"]) #status {
         top: auto;
         bottom: 132px;
         left: 32px;
         font-size: 14px;
         z-index: 11;
+      }
+
+      #lean-debug {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        margin: 0;
+        padding: 12px 16px;
+        font-size: 16px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        z-index: 20;
+      }
+
+      #lean-debug[hidden] {
+        display: none;
       }
 
       #base {
@@ -59,6 +76,10 @@
         height: 100vh;
         display: block;
         z-index: 1;
+      }
+
+      body[data-screen="start"] #base {
+        display: none;
       }
 
 
@@ -132,6 +153,7 @@
     <video id="video" autoplay playsinline muted hidden></video>
     <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
+    <pre id="lean-debug" hidden></pre>
         
     <section data-screen="start">
       <h1>Stell dich auf ein Bein</h1>
@@ -140,10 +162,15 @@
     </section>
 
     <!-- Board only appears once the one-leg stand was recognized -->
+    <canvas id="base"></canvas>
+
     <section data-screen="intro" hidden>
-      <canvas id="base"></canvas>
       <h1>Neige deinen Oberkörper um das Brett zu steuern</h1>
       <img id="cat" src="img/cat_intro.gif" alt="Katze auf einem Bein neigt den Oberkörper nach vorne, hinten, links und rechts">
+    </section>
+
+    <section data-screen="spiel" hidden>
+      <h1 id="game-hint">Steh gerade, das Brett wird ausgerichtet</h1>
     </section>
 
     <script type="module" src="/src/main.ts"></script>
