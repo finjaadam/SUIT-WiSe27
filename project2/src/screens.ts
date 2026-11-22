@@ -1,4 +1,4 @@
-export type Screen = 'start' | 'intro' | 'spiel';
+export type Screen = 'start' | 'intro' | 'spiel' | 'auswertung';
 
 export let currentScreen: Screen = 'start';
 

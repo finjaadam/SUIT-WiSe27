@@ -6,3 +6,5 @@ export function setBoardTilt(lean: Lean): void;
 
 /** Puts the ball back to its start position above the board, without any motion */
 export function resetBall(): void;
+
+export function onGoalReached(callback: () => void): void;

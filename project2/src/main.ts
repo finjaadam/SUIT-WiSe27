@@ -5,7 +5,7 @@ import {catLeanAt, INTRO_MS} from './catLean';
 import {LeanDebug} from './leanDebug';
 import {OneLegStand} from './oneLegStand';
 import {currentScreen, showScreen} from './screens';
-import {resetBall, setBoardTilt} from './threejsBase.js';
+import {onGoalReached, resetBall, setBoardTilt} from './threejsBase.js';
 
 const video         = document.getElementById('video')          as HTMLVideoElement;
 const canvas        = document.getElementById('canvas')         as HTMLCanvasElement;
@@ -25,6 +25,10 @@ let lastVideoTime = -1;
 // The start screen stays visible while the intro GIF loads, so start it only once
 let introStarted = false;
 let introStartMs = 0;
+
+const goalFeedback = document.getElementById('goal-feedback') as HTMLDivElement;
+let feedbackTimeout: number | undefined;
+const applauseAudio = new Audio('/sounds_interaction2/04_finished.mp3')
 
 async function init(): Promise<void> {
     poseLandmarker = await createPoseLandmarker();
@@ -113,6 +117,23 @@ function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
         radius: 10 
     });
 }
+
+function playPositiveSound(): void {
+    applauseAudio.currentTime = 0;
+    applauseAudio.play().catch(() => {});
+}
+
+onGoalReached(() => {
+    playPositiveSound();
+
+    goalFeedback.hidden = false;
+    window.clearTimeout(feedbackTimeout);
+
+    feedbackTimeout = window.setTimeout(() => {
+        goalFeedback.hidden = true;
+        showScreen('auswertung'); 
+    }, 3000);
+});
 
 showScreen('start');
 init().catch(err => {
