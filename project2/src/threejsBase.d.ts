@@ -4,6 +4,9 @@ export type Lean = {forward: number, left: number};
 /** Tilts the board like the lean: leaning forward lowers the front edge, leaning left the left edge */
 export function setBoardTilt(lean: Lean): void;
 
+/** Freezes board and ball while paused, the scene is still rendered */
+export function setPaused(paused: boolean): void;
+
 /** Puts the ball back to its start position above the board, without any motion */
 export function resetBall(): void;
 

@@ -5,7 +5,7 @@ import {catLeanAt, INTRO_MS} from './catLean';
 import {LeanDebug} from './leanDebug';
 import {OneLegStand} from './oneLegStand';
 import {currentScreen, showScreen} from './screens';
-import {onGoalReached, onTrapReached, resetBall, setBoardTilt} from './threejsBase.js';
+import {onGoalReached, onTrapReached, resetBall, setBoardTilt, setPaused} from './threejsBase.js';
 
 const video         = document.getElementById('video')          as HTMLVideoElement;
 const canvas        = document.getElementById('canvas')         as HTMLCanvasElement;
@@ -18,11 +18,16 @@ const oneLegStand   = new OneLegStand();
 const bodyLean      = new BodyLean();
 const catImage      = document.getElementById('cat')            as HTMLImageElement;
 const gameHint      = document.getElementById('game-hint')      as HTMLHeadingElement;
+const pauseScreen   = document.getElementById('pause')          as HTMLDivElement;
+const pauseProgress = document.getElementById('pause-progress') as HTMLDivElement;
+
+const PAUSE_DELAY_MS = 2000;
 
 let poseLandmarker: PoseLandmarker;
 let leanDebug: LeanDebug;
 let lastVideoTime = -1;
 let introStartMs = 0;
+let pauseStartMs: number | undefined;
 
 const goalFeedback = document.getElementById('goal-feedback') as HTMLDivElement;
 let feedbackTimeout: number | undefined;
@@ -31,6 +36,7 @@ const failAudio = new Audio('/sounds_interaction2/03_stop.mp3');
 
 let failedAttempts = 0;
 let gameStartTime = 0;
+let pauseCount = 0;
 let roundFinished = false;
 
 async function init(): Promise<void> {
@@ -99,10 +105,37 @@ function startGame(timeMs: number): void {
 }
 
 function updateGame(landmarks: NormalizedLandmark[] | undefined, worldLandmarks: Landmark[] | undefined, timeMs: number): void {
+    if (updatePause(landmarks, timeMs)) return;
     // The board stays flat until the player's upright posture is known
     setBoardTilt(bodyLean.update(worldLandmarks, timeMs));
     gameHint.hidden = !bodyLean.isCalibrating;
     leanDebug.update(landmarks, worldLandmarks, bodyLean.isCalibrating);
+}
+
+/**
+ * Pauses the game once the player stood on both legs for a moment, until they
+ * stand on one leg again like on the start screen. Returns whether the game is paused.
+ */
+function updatePause(landmarks: NormalizedLandmark[] | undefined, timeMs: number): boolean {
+    const progress = oneLegStand.update(landmarks, timeMs);
+
+    if (pauseStartMs === undefined) {
+        if (roundFinished || oneLegStand.msWithoutOneLeg(timeMs) < PAUSE_DELAY_MS) return false;
+        pauseStartMs = timeMs;
+        setPaused(true);
+        pauseCount++;
+        gameHint.hidden = true;
+    }
+
+    pauseProgress.style.width = `${progress * 100}%`;
+    if (progress >= 1) {
+        // The pause does not count towards the round time
+        gameStartTime += timeMs - pauseStartMs;
+        pauseStartMs = undefined;
+        setPaused(false);
+    }
+    pauseScreen.hidden = pauseStartMs === undefined;
+    return pauseStartMs !== undefined;
 }
 
 /** The cat shows how to steer, afterwards the player stands on one leg to take over the board */
@@ -128,6 +161,7 @@ function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
 
 function startRoundStats(): void {
     failedAttempts = 0;
+    pauseCount = 0;
     roundFinished = false;
     gameStartTime = performance.now();
 }
@@ -166,7 +200,7 @@ onGoalReached(() => {
 
         const ergebnisText = document.getElementById('ergebnis-text');
         if (ergebnisText) {
-            ergebnisText.textContent = `Dauer: ${durationSeconds} Sekunden | Fehlversuche: ${failedAttempts}`;
+            ergebnisText.textContent = `Dauer: ${durationSeconds} Sekunden | Fehlversuche: ${failedAttempts} | Bein abgestellt: ${pauseCount}`;
         }
 
         showScreen('auswertung');
