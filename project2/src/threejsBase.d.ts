@@ -8,3 +8,5 @@ export function setBoardTilt(lean: Lean): void;
 export function resetBall(): void;
 
 export function onGoalReached(callback: () => void): void;
+
+export function onTrapReached(callback: () => void): void;

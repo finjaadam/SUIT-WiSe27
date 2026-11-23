@@ -5,7 +5,7 @@ import {catLeanAt, INTRO_MS} from './catLean';
 import {LeanDebug} from './leanDebug';
 import {OneLegStand} from './oneLegStand';
 import {currentScreen, showScreen} from './screens';
-import {onGoalReached, resetBall, setBoardTilt} from './threejsBase.js';
+import {onGoalReached, onTrapReached, resetBall, setBoardTilt} from './threejsBase.js';
 
 const video         = document.getElementById('video')          as HTMLVideoElement;
 const canvas        = document.getElementById('canvas')         as HTMLCanvasElement;
@@ -28,7 +28,12 @@ let introStartMs = 0;
 
 const goalFeedback = document.getElementById('goal-feedback') as HTMLDivElement;
 let feedbackTimeout: number | undefined;
-const applauseAudio = new Audio('/sounds_interaction2/04_finished.mp3')
+const applauseAudio = new Audio('/sounds_interaction2/04_finished.mp3');
+const failAudio = new Audio('/sounds_interaction2/03_stop.mp3');
+
+let failedAttempts = 0;
+let gameStartTime = 0;
+let roundFinished = false;
 
 async function init(): Promise<void> {
     poseLandmarker = await createPoseLandmarker();
@@ -88,6 +93,7 @@ function startGame(timeMs: number): void {
     resetBall();
     bodyLean.calibrate(timeMs);
     showScreen('spiel');
+    startRoundStats();
 }
 
 function updateGame(landmarks: NormalizedLandmark[] | undefined, worldLandmarks: Landmark[] | undefined, timeMs: number): void {
@@ -118,12 +124,36 @@ function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
     });
 }
 
+function startRoundStats(): void {
+    failedAttempts = 0;
+    roundFinished = false;
+    gameStartTime = performance.now();
+}
+
 function playPositiveSound(): void {
     applauseAudio.currentTime = 0;
     applauseAudio.play().catch(() => {});
 }
 
+function playNegativeSound(): void {
+    failAudio.currentTime = 0;
+    failAudio.play().catch((err) => {
+        console.error('Fehler beim Abspielen von failAudio:', err);
+    });
+}
+
+onTrapReached(() => {
+    if (!roundFinished) {
+        failedAttempts++;
+        playNegativeSound();
+    }
+});
+
 onGoalReached(() => {
+    if (roundFinished) return;
+    roundFinished = true;
+
+    const durationSeconds = ((performance.now() - gameStartTime) / 1000).toFixed(1);
     playPositiveSound();
 
     goalFeedback.hidden = false;
@@ -131,7 +161,13 @@ onGoalReached(() => {
 
     feedbackTimeout = window.setTimeout(() => {
         goalFeedback.hidden = true;
-        showScreen('auswertung'); 
+
+        const ergebnisText = document.getElementById('ergebnis-text');
+        if (ergebnisText) {
+            ergebnisText.textContent = `Dauer: ${durationSeconds} Sekunden | Fehlversuche: ${failedAttempts}`;
+        }
+
+        showScreen('auswertung');
     }, 3000);
 });
 
