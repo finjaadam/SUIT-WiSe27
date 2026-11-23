@@ -30,12 +30,80 @@
         font-size: 24px;
         z-index: 2;
       }
+
+      /* The skeleton only appears once the game started */
+      body[data-screen="start"] #canvas {
+        display: none;
+      }
+
+      [data-screen="start"] {
+        position: absolute;
+        inset: 0;
+        z-index: 3;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4vh;
+        padding-inline: 15vw;
+      }
+
+      [data-screen][hidden] {
+        display: none;
+      }
+
+      [data-screen="start"] h1 {
+        margin: 0;
+        font-size: 9vh;
+        font-weight: bold;
+        text-align: center;
+        text-shadow: 0 0 5px #43738a;
+        color: #265cc0;
+      }
+
+      [data-screen="start"] ul {
+        margin: 0;
+        font-size: 3.5vh;
+        line-height: 1.5;
+      }
+
+      button {
+        align-items: center;
+        background-color: #fff;
+        border-radius: 24px;
+        border-color: #77a6f3;
+        box-shadow: rgba(0, 0, 0, .2) 0 3px 5px -1px, rgba(0, 0, 0, .14) 0 6px 10px 0, rgba(0, 0, 0, .12) 0 1px 18px 0;
+        color: #292b2c;
+        cursor: pointer;
+        display: inline-flex;
+        font-size: 2.5vh;
+        font-weight: 500;
+        height: 48px;
+        justify-content: center;
+        padding: 2px 24px;
+      }
+
+      button:disabled {
+        cursor: default;
+        opacity: 0.6;
+      }
     </style>
   </head>
   <body>
     <video id="video" autoplay playsinline muted hidden></video>
     <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
+
+    <section data-screen="start">
+      <h1>Löse das Frage-Antwort-Memory</h1>
+      <ul>
+        <li>Drehe die Karten um, indem du die Posen einnimmst</li>
+        <li>Logge die Frage-Antwort-Paare ein, indem du laut „einloggen“ sagst, und sage „zurück“, wenn du neue Karten auswählen möchtest</li>
+      </ul>
+      <button id="start" disabled>Modell wird geladen…</button>
+    </section>
+
+    <section data-screen="spiel" hidden></section>
 
     <script type="module" src="/src/main.ts"></script>
   </body>

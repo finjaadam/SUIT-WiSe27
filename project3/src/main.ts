@@ -1,9 +1,11 @@
 import {DrawingUtils, PoseLandmarker, type NormalizedLandmark} from '@mediapipe/tasks-vision';
 import {createPoseLandmarker} from '../../shared/poseLandmarker';
+import {showScreen} from './screens';
 
 const video        = document.getElementById('video')  as HTMLVideoElement;
 const canvas       = document.getElementById('canvas') as HTMLCanvasElement;
 const status       = document.getElementById('status') as HTMLParagraphElement;
+const startBtn     = document.getElementById('start')  as HTMLButtonElement;
 const ctx          = canvas.getContext('2d')!;
 const drawingUtils = new DrawingUtils(ctx);
 
@@ -21,6 +23,8 @@ async function init(): Promise<void> {
     canvas.height = video.videoHeight;
 
     status.textContent = '';
+    startBtn.disabled = false;
+    startBtn.textContent = 'Starten';
     renderLoop();
 }
 
@@ -47,9 +51,13 @@ function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
     });
 }
 
+startBtn.onclick = () => showScreen('spiel');
+
+showScreen('start');
 init().catch(err => {
     console.error(err);
     status.textContent = (err as DOMException).name === 'NotAllowedError'
         ? 'Kamerazugriff wurde verweigert. Bitte im Browser erlauben.'
         : 'Fehler beim Start. Details in der Konsole.';
+    startBtn.textContent = 'Nicht verfügbar';
 });
