@@ -22,8 +22,6 @@ const gameHint      = document.getElementById('game-hint')      as HTMLHeadingEl
 let poseLandmarker: PoseLandmarker;
 let leanDebug: LeanDebug;
 let lastVideoTime = -1;
-// The start screen stays visible while the intro GIF loads, so start it only once
-let introStarted = false;
 let introStartMs = 0;
 
 const goalFeedback = document.getElementById('goal-feedback') as HTMLDivElement;
@@ -48,6 +46,7 @@ async function init(): Promise<void> {
 
     status.textContent = '';
     renderLoop();
+    await startIntro();
 }
 
 function renderLoop(): void {
@@ -73,10 +72,7 @@ function updateStartScreen(landmarks: NormalizedLandmark[] | undefined, timeMs: 
         progress > 0                         ? 'Gut so, halte die Position!' :
                                                '';
 
-    if (progress >= 1 && !introStarted) {
-        introStarted = true;
-        startIntro();
-    }
+    if (progress >= 1) startGame(timeMs);
 }
 
 async function startIntro(): Promise<void> {
@@ -86,6 +82,12 @@ async function startIntro(): Promise<void> {
     await catImage.decode().catch(() => {});
     showScreen('intro');
     introStartMs = performance.now();
+}
+
+/** The player only has to stand on one leg after watching the intro, not during it */
+function showStartScreen(): void {
+    startProgress.style.width = '0';
+    showScreen('start');
 }
 
 function startGame(timeMs: number): void {
@@ -103,11 +105,11 @@ function updateGame(landmarks: NormalizedLandmark[] | undefined, worldLandmarks:
     leanDebug.update(landmarks, worldLandmarks, bodyLean.isCalibrating);
 }
 
-/** The cat shows how to steer, afterwards the player takes over the board */
+/** The cat shows how to steer, afterwards the player stands on one leg to take over the board */
 function updateIntro(timeMs: number): void {
     const introMs = timeMs - introStartMs;
     if (introMs < INTRO_MS) setBoardTilt(catLeanAt(introMs));
-    else startGame(timeMs);
+    else showStartScreen();
 }
 
 function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
@@ -171,7 +173,7 @@ onGoalReached(() => {
     }, 3000);
 });
 
-showScreen('start');
+showScreen('laden');
 init().catch(err => {
     console.error(err);
     status.textContent = (err as DOMException).name === 'NotAllowedError'

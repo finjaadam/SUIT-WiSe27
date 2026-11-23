@@ -78,7 +78,7 @@
         z-index: 1;
       }
 
-      body[data-screen="start"] #base {
+      body:is([data-screen="laden"], [data-screen="start"]) #base {
         display: none;
       }
 
@@ -183,18 +183,18 @@
     <p id="status">Modell wird geladen…</p>
     <pre id="lean-debug" hidden></pre>
         
-    <section data-screen="start">
-      <h1>Stell dich auf ein Bein</h1>
-      <div id="start-progress-track"><div id="start-progress"></div></div>
-      <p id="start-hint"></p>
-    </section>
-
-    <!-- Board only appears once the one-leg stand was recognized -->
+    <!-- Board is hidden while loading and on the one-leg screen -->
     <canvas id="base"></canvas>
 
     <section data-screen="intro" hidden>
       <h1>Neige deinen Oberkörper um das Brett zu steuern</h1>
       <img id="cat" src="img/cat_intro.gif" alt="Katze auf einem Bein neigt den Oberkörper nach vorne, hinten, links und rechts">
+    </section>
+
+    <section data-screen="start" hidden>
+      <h1>Stell dich auf ein Bein</h1>
+      <div id="start-progress-track"><div id="start-progress"></div></div>
+      <p id="start-hint"></p>
     </section>
 
     <section data-screen="spiel" hidden>

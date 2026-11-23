@@ -1,6 +1,7 @@
-export type Screen = 'start' | 'intro' | 'spiel' | 'auswertung';
+// 'laden' has no section of its own, only the loading status is visible
+export type Screen = 'laden' | 'intro' | 'start' | 'spiel' | 'auswertung';
 
-export let currentScreen: Screen = 'start';
+export let currentScreen: Screen = 'laden';
 
 export function showScreen(next: Screen): void {
     currentScreen = next;
