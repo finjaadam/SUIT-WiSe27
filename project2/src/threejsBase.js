@@ -208,13 +208,13 @@ function main() {
                 return dist < h.radius;
             });
 
-            if (hitHole) {
-                holeTriggered = true;
-                if (hitHole.type === 'goal') {
-                    if (goalRingMesh) {
-                        goalRingMesh.material.color.setHex(0xffffff); // Ring blitzt kurz hell auf
-                    }
-                    onGoalCallback();
+        if (hitHole) {
+            holeTriggered = true;
+            if (hitHole.type === 'goal') {
+                if (goalRingMesh) {
+                    goalRingMesh.material.color.setHex(0xffffff); // Ring blitzt kurz hell auf
+                }
+                onGoalCallback();
                 } else if (hitHole.type === 'trap') {
                     onTrapCallback();
                 }

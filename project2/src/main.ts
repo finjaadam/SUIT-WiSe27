@@ -136,7 +136,6 @@ function playPositiveSound(): void {
 }
 
 function playNegativeSound(): void {
-    console.log('Spiele Fail-Sound ab...');
     failAudio.currentTime = 0;
     failAudio.play().catch((err) => {
         console.error('Fehler beim Abspielen von failAudio:', err);
