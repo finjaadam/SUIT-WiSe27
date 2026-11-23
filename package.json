@@ -3,7 +3,8 @@
   "private": true,
   "workspaces": [
     "project1",
-    "project2"
+    "project2",
+    "project3"
   ],
   "dependencies": {
     "@mediapipe/tasks-vision": "^1.2.3",

@@ -17,6 +17,7 @@ Das Repo ist ein npm-Workspace: Alle Abhängigkeiten (MediaPipe, three.js, canno
 |------------|------------------------------------------------------------------------------------------------------------|
 | `project1` | Interaktion 1                                                                                              |
 | `project2` | Interaktion 2                                                                                              |
+| `project3` | Interaktion 3                                                                                              |
 | `shared`   | Gemeinsam genutzt: Pose-Modell (`shared/models`) und `createPoseLandmarker()` (`shared/poseLandmarker.ts`) |
 
 Ebenfalls zentral im Hauptverzeichnis: `.gitignore` und `tsconfig.base.json`, die jedes Projekt per `extends` übernimmt. Die WASM-Dateien kommen direkt aus `@mediapipe/tasks-vision`.
@@ -30,6 +31,7 @@ npm install
 # 2. Dev-Server eines Projekts starten
 npm run dev -w project1    # Interaktion 1
 npm run dev -w project2    # Interaktion 2
+npm run dev -w project3    # Interaktion 3
 ```
 
 Alternativ im jeweiligen Projektordner `npm run dev` ausführen.
