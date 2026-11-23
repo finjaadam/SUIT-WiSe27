@@ -10,3 +10,6 @@ export function resetBall(): void;
 export function onGoalReached(callback: () => void): void;
 
 export function onTrapReached(callback: () => void): void;
+
+/** Called whenever the ball fell off the board or through a hole and was put back */
+export function onBallLost(callback: () => void): void;
