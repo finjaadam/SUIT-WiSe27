@@ -106,25 +106,40 @@
         display: grid;
         grid-template-columns: repeat(2, auto);
         place-content: center;
-        gap: 3vh;
+        gap: 4vh;
         z-index: 2;
       }
 
-      #pose-cards img {
-        height: 42vh;
+      .pose-card {
+        position: relative;
       }
 
-      #pose-debug {
+      .pose-card img {
+        display: block;
+        height: 40vh;
+      }
+
+      .pose-ring {
         position: absolute;
-        top: 16px;
-        right: 16px;
-        margin: 0;
-        padding: 12px 16px;
-        font-size: 20px;
-        color: #fff;
-        background: rgba(0, 0, 0, 0.8);
-        border-radius: 8px;
-        z-index: 3;
+        right: -3vh;
+        bottom: -3vh;
+        width: 8vh;
+        height: 8vh;
+        transform: rotate(-90deg);
+      }
+
+      .pose-ring circle {
+        fill: #fff;
+        stroke: #e3ecfb;
+        stroke-width: 5;
+      }
+
+      .pose-ring .progress {
+        fill: none;
+        stroke-dasharray: 100;
+        stroke-dashoffset: 100;
+        stroke-linecap: round;
+        transition: stroke-dashoffset 0.15s linear, stroke 0.15s linear;
       }
 
       button {
@@ -165,7 +180,6 @@
 
     <section data-screen="spiel" hidden>
       <h1 id="body-hint" hidden>Stell dich so hin, dass du von Kopf bis Fuß zu sehen bist.</h1>
-      <pre id="pose-debug"></pre>
       <div id="pose-cards"></div>
     </section>
 
