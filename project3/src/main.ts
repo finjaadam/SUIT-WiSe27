@@ -1,11 +1,16 @@
-import {DrawingUtils, PoseLandmarker, type NormalizedLandmark} from '@mediapipe/tasks-vision';
+import {DrawingUtils, PoseLandmarker, type Landmark, type NormalizedLandmark} from '@mediapipe/tasks-vision';
 import {createPoseLandmarker} from '../../shared/poseLandmarker';
-import {showScreen} from './screens';
+import {MATCH_SCORE, isBodyInFrame, poseScore} from './poseMatch';
+import {POSES} from './poses';
+import {currentScreen, showScreen} from './screens';
 
 const video        = document.getElementById('video')  as HTMLVideoElement;
 const canvas       = document.getElementById('canvas') as HTMLCanvasElement;
 const status       = document.getElementById('status') as HTMLParagraphElement;
 const startBtn     = document.getElementById('start')  as HTMLButtonElement;
+const poseDebug    = document.getElementById('pose-debug') as HTMLPreElement;
+const bodyHint     = document.getElementById('body-hint')  as HTMLHeadingElement;
+const poseCards    = document.getElementById('pose-cards') as HTMLDivElement;
 const ctx          = canvas.getContext('2d')!;
 const drawingUtils = new DrawingUtils(ctx);
 
@@ -33,8 +38,20 @@ function renderLoop(): void {
         lastVideoTime = video.currentTime;
         const result = poseLandmarker.detectForVideo(video, performance.now());
         drawSkeleton(result.landmarks[0]);
+        if (currentScreen === 'spiel') {
+            bodyHint.hidden = isBodyInFrame(result.landmarks[0]);
+            showPoseScores(result.worldLandmarks[0]);
+        }
     }
     requestAnimationFrame(renderLoop);
+}
+
+/** Temporary view to tune the pose detection */
+function showPoseScores(worldLandmarks: Landmark[] | undefined): void {
+    poseDebug.textContent = POSES.map(pose => {
+        const score = poseScore(pose, worldLandmarks);
+        return `${score >= MATCH_SCORE ? '✓' : ' '} ${Math.round(score * 100)} %  ${pose.name}`;
+    }).join('\n');
 }
 
 function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
@@ -50,6 +67,8 @@ function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
         radius: 10,
     });
 }
+
+poseCards.append(...POSES.map(pose => Object.assign(new Image(), {src: pose.image, alt: pose.name})));
 
 startBtn.onclick = () => showScreen('spiel');
 

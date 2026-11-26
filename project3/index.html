@@ -36,6 +36,18 @@
         display: none;
       }
 
+      body[data-screen="spiel"] #canvas {
+        inset: auto;
+        bottom: 20px;
+        left: 20px;
+        width: 240px;
+        height: 135px;
+        background: white;
+        border: 1px solid rgba(0, 0, 0, 0.2);
+        border-radius: 8px;
+        z-index: 10;
+      }
+
       [data-screen="start"] {
         position: absolute;
         inset: 0;
@@ -65,6 +77,54 @@
         margin: 0;
         font-size: 3.5vh;
         line-height: 1.5;
+      }
+
+      #body-hint {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        max-width: 80vw;
+        margin: 0;
+        padding: 16px 32px;
+        font-size: 8vh;
+        text-align: center;
+        background: rgba(255, 255, 255, 0.8);
+        border-radius: 16px;
+        z-index: 3;
+      }
+
+      #body-hint[hidden] {
+        display: none;
+      }
+
+      /* Memory board in the middle of the screen */
+      #pose-cards {
+        position: absolute;
+        inset: 0;
+        display: grid;
+        grid-template-columns: repeat(2, auto);
+        place-content: center;
+        gap: 3vh;
+        z-index: 2;
+      }
+
+      #pose-cards img {
+        height: 42vh;
+      }
+
+      #pose-debug {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        margin: 0;
+        padding: 12px 16px;
+        font-size: 20px;
+        color: #fff;
+        background: rgba(0, 0, 0, 0.8);
+        border-radius: 8px;
+        z-index: 3;
       }
 
       button {
@@ -103,7 +163,11 @@
       <button id="start" disabled>Modell wird geladen…</button>
     </section>
 
-    <section data-screen="spiel" hidden></section>
+    <section data-screen="spiel" hidden>
+      <h1 id="body-hint" hidden>Stell dich so hin, dass du von Kopf bis Fuß zu sehen bist.</h1>
+      <pre id="pose-debug"></pre>
+      <div id="pose-cards"></div>
+    </section>
 
     <script type="module" src="/src/main.ts"></script>
   </body>
