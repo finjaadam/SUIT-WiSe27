@@ -11,17 +11,6 @@
         font-family: sans-serif;
       }
 
-      #canvas {
-        position: absolute;
-        inset: 0;
-        width: 100vw;
-        height: 100vh;
-        object-fit: cover;
-        pointer-events: none;
-        /* Mirror the view so it behaves like a mirror */
-        transform: scaleX(-1);
-      }
-
       #status {
         position: absolute;
         top: 24px;
@@ -29,23 +18,6 @@
         margin: 0;
         font-size: 24px;
         z-index: 2;
-      }
-
-      /* The skeleton only appears once the game started */
-      body[data-screen="start"] #canvas {
-        display: none;
-      }
-
-      body[data-screen="spiel"] #canvas {
-        inset: auto;
-        bottom: 20px;
-        left: 20px;
-        width: 240px;
-        height: 135px;
-        background: white;
-        border: 1px solid rgba(0, 0, 0, 0.2);
-        border-radius: 8px;
-        z-index: 10;
       }
 
       [data-screen="start"] {
@@ -99,15 +71,43 @@
         display: none;
       }
 
-      /* Memory board in the middle of the screen */
+      /* Memory board: two cards on each side, the live skeleton in the middle */
       #pose-cards {
         position: absolute;
         inset: 0;
         display: grid;
-        grid-template-columns: repeat(2, auto);
+        grid-template-areas: "a live b" "c live d";
         place-content: center;
         gap: 4vh;
         z-index: 2;
+      }
+
+      #live {
+        grid-area: live;
+        position: relative;
+      }
+
+      /* The pose that fits best lies faintly on the player's skeleton */
+      #best-pose {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        height: 100%;
+        opacity: 0.4;
+        mix-blend-mode: multiply;
+        clip-path: inset(6%);
+        pointer-events: none;
+        z-index: 1;
+      }
+
+      #canvas {
+        display: block;
+        width: 60vh;
+        height: 84vh;
+        object-fit: cover;
+        background: #f4f7fd;
+        border-radius: 16px;
+        transform: scaleX(-1);
       }
 
       .pose-card {
@@ -166,7 +166,6 @@
   </head>
   <body>
     <video id="video" autoplay playsinline muted hidden></video>
-    <canvas id="canvas"></canvas>
     <p id="status">Modell wird geladen…</p>
 
     <section data-screen="start">
@@ -180,7 +179,12 @@
 
     <section data-screen="spiel" hidden>
       <h1 id="body-hint" hidden>Stell dich so hin, dass du von Kopf bis Fuß zu sehen bist.</h1>
-      <div id="pose-cards"></div>
+      <div id="pose-cards">
+        <div id="live">
+          <img id="best-pose" hidden alt="">
+          <canvas id="canvas"></canvas>
+        </div>
+      </div>
     </section>
 
     <script type="module" src="/src/main.ts"></script>
