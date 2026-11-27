@@ -50,6 +50,11 @@ export class OneLegStand {
         if (this.holdStartMs === undefined) return 0;
         return Math.min((timeMs - this.holdStartMs) / HOLD_MS, 1);
     }
+
+    /** How long the player has not been standing on one leg */
+    msWithoutOneLeg(timeMs: number): number {
+        return timeMs - this.lastOneLegMs;
+    }
 }
 
 function detectPosture(landmarks: NormalizedLandmark[] | undefined, thresholdFactor: number): Posture {

@@ -7,6 +7,7 @@ let resetBallInWorld = () => {};
 let onGoalCallback = () => {};
 let onTrapCallback = () => {};
 let onBallLostCallback = () => {};
+let paused = false;
 
 export function resetBall() {
     resetBallInWorld();
@@ -22,6 +23,10 @@ export function onBallLost(callback) {
 
 export function onTrapReached(callback) {
     onTrapCallback = callback;
+}
+
+export function setPaused(value) {
+    paused = value;
 }
 
 export function setBoardTilt({forward, left}) {
@@ -192,12 +197,14 @@ function main() {
         timer.update(timestamp);
         const deltaTime = Math.min(timer.getDelta(), 0.1); 
 
-        currentTilt.pitch += (targetTilt.pitch - currentTilt.pitch) * 0.1;
-        currentTilt.roll += (targetTilt.roll - currentTilt.roll) * 0.1;
+        if (!paused) {
+            currentTilt.pitch += (targetTilt.pitch - currentTilt.pitch) * 0.1;
+            currentTilt.roll += (targetTilt.roll - currentTilt.roll) * 0.1;
 
-        plateBody.quaternion.setFromEuler(currentTilt.pitch, 0, currentTilt.roll);
+            plateBody.quaternion.setFromEuler(currentTilt.pitch, 0, currentTilt.roll);
 
-        world.step(1 / 120, deltaTime, 5);
+            world.step(1 / 120, deltaTime, 5);
+        }
 
         plate.position.copy(plateBody.position);
         plate.quaternion.copy(plateBody.quaternion);
