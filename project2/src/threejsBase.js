@@ -6,6 +6,7 @@ const targetTilt = { pitch: 0, roll: 0 };
 let resetBallInWorld = () => {};
 let onGoalCallback = () => {};
 let onTrapCallback = () => {};
+let onBallLostCallback = () => {};
 let paused = false;
 
 export function resetBall() {
@@ -14,6 +15,10 @@ export function resetBall() {
 
 export function onGoalReached(callback) {
     onGoalCallback = callback;
+}
+
+export function onBallLost(callback) {
+    onBallLostCallback = callback;
 }
 
 export function onTrapReached(callback) {
@@ -231,6 +236,7 @@ function main() {
         // Ball Reset
         if (ballBody.position.y < -2) {
             resetBall();
+            onBallLostCallback();
         }
 
         renderer.render(scene, camera);

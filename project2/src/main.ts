@@ -1,11 +1,11 @@
 import {DrawingUtils, PoseLandmarker, type Landmark, type NormalizedLandmark} from '@mediapipe/tasks-vision';
 import {createPoseLandmarker} from '../../shared/poseLandmarker';
 import {BodyLean} from './bodyLean';
-import {catLeanAt, INTRO_MS} from './catLean';
+import {catLeanAt} from './catLean';
 import {LeanDebug} from './leanDebug';
 import {OneLegStand} from './oneLegStand';
 import {currentScreen, showScreen} from './screens';
-import {onGoalReached, onTrapReached, resetBall, setBoardTilt, setPaused} from './threejsBase.js';
+import {onBallLost, onGoalReached, onTrapReached, resetBall, setBoardTilt, setPaused} from './threejsBase.js';
 
 const video         = document.getElementById('video')          as HTMLVideoElement;
 const canvas        = document.getElementById('canvas')         as HTMLCanvasElement;
@@ -17,6 +17,7 @@ const drawingUtils  = new DrawingUtils(ctx);
 const oneLegStand   = new OneLegStand();
 const bodyLean      = new BodyLean();
 const catImage      = document.getElementById('cat')            as HTMLImageElement;
+const startButton   = document.getElementById('start-button')   as HTMLButtonElement;
 const gameHint      = document.getElementById('game-hint')      as HTMLHeadingElement;
 const pauseScreen   = document.getElementById('pause')          as HTMLDivElement;
 const pauseProgress = document.getElementById('pause-progress') as HTMLDivElement;
@@ -82,15 +83,22 @@ function updateStartScreen(landmarks: NormalizedLandmark[] | undefined, timeMs: 
 }
 
 async function startIntro(): Promise<void> {
-    // New URL so the GIF starts from its first frame,
-    // show the intro once it is loaded so the board stays in sync with the cat
+    await playCatFromStart();
+    showScreen('intro');
+}
+
+/**
+ * The GIF runs on its own and falls behind when the browser stalls, e.g. when
+ * the trap sound plays, so cat and board start over together.
+ */
+async function playCatFromStart(): Promise<void> {
+    // A new URL is the only way to restart a GIF, the board starts once it is loaded
     catImage.src = `img/cat_intro.gif?t=${Date.now()}`;
     await catImage.decode().catch(() => {});
-    showScreen('intro');
     introStartMs = performance.now();
 }
 
-/** The player only has to stand on one leg after watching the intro, not during it */
+/** The player only has to stand on one leg after pressing start, not during the intro */
 function showStartScreen(): void {
     startProgress.style.width = '0';
     showScreen('start');
@@ -140,9 +148,7 @@ function updatePause(landmarks: NormalizedLandmark[] | undefined, timeMs: number
 
 /** The cat shows how to steer, afterwards the player stands on one leg to take over the board */
 function updateIntro(timeMs: number): void {
-    const introMs = timeMs - introStartMs;
-    if (introMs < INTRO_MS) setBoardTilt(catLeanAt(introMs));
-    else showStartScreen();
+    setBoardTilt(catLeanAt(timeMs - introStartMs));
 }
 
 function drawSkeleton(landmarks: NormalizedLandmark[] | undefined): void {
@@ -178,6 +184,10 @@ function playNegativeSound(): void {
     });
 }
 
+onBallLost(() => {
+    if (currentScreen === 'intro') playCatFromStart();
+});
+
 onTrapReached(() => {
     if (!roundFinished) {
         failedAttempts++;
@@ -186,7 +196,7 @@ onTrapReached(() => {
 });
 
 onGoalReached(() => {
-    if (roundFinished) return;
+    if (currentScreen !== 'spiel' || roundFinished) return;
     roundFinished = true;
 
     const durationSeconds = ((performance.now() - gameStartTime) / 1000).toFixed(1);
@@ -206,6 +216,8 @@ onGoalReached(() => {
         showScreen('auswertung');
     }, 3000);
 });
+
+startButton.addEventListener('click', showStartScreen);
 
 showScreen('laden');
 init().catch(err => {
