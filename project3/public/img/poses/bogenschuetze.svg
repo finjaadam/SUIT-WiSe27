@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 440">
+  <rect x="4" y="4" width="292" height="432" rx="24" fill="#fff" stroke="#77a6f3" stroke-width="6"/>
+  <g fill="none" stroke="#265cc0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="150" cy="120" r="28"/>
+    <path d="M150 148 V275"/>
+    <!-- Bow arm stretched to the side, the other arm drawn back at shoulder height -->
+    <path d="M150 165 H268"/>
+    <path d="M150 165 L72 170 L118 130"/>
+    <path d="M150 275 L95 400 M150 275 L205 400"/>
+  </g>
+</svg>

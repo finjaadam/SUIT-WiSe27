@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 440">
+  <rect x="4" y="4" width="292" height="432" rx="24" fill="#fff" stroke="#77a6f3" stroke-width="6"/>
+  <g fill="none" stroke="#265cc0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="150" cy="120" r="28"/>
+    <path d="M150 148 V275"/>
+    <!-- Arm and leg of one side spread, the other side stays down -->
+    <path d="M150 165 L65 80 M150 165 L182 280"/>
+    <path d="M150 275 L62 363 M150 275 L165 400"/>
+  </g>
+</svg>

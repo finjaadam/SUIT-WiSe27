@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 440">
+  <rect x="4" y="4" width="292" height="432" rx="24" fill="#fff" stroke="#77a6f3" stroke-width="6"/>
+  <g fill="none" stroke="#265cc0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="195" cy="139" r="28"/>
+    <path d="M150 275 L186 166"/>
+    <!-- Upper arm stretched over the head to the side the body leans to -->
+    <path d="M181 182 L128 120 L232 72"/>
+    <path d="M181 182 L216 236 L232 292"/>
+    <path d="M150 275 L128 400 M150 275 L172 400"/>
+  </g>
+</svg>

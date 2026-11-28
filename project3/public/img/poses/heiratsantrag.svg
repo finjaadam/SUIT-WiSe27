@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 440">
+  <rect x="4" y="4" width="292" height="432" rx="24" fill="#fff" stroke="#77a6f3" stroke-width="6"/>
+  <g fill="none" stroke="#265cc0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="150" cy="155" r="28"/>
+    <path d="M150 183 V310"/>
+    <path d="M150 200 L92 280"/>
+    <path d="M150 200 L192 262 L200 330"/>
+    <!-- Kneeling leg, the shin lies on the ground behind -->
+    <path d="M150 310 L118 400 H80"/>
+    <!-- Front leg with the foot on the ground -->
+    <path d="M150 310 L205 335 L205 400"/>
+  </g>
+</svg>

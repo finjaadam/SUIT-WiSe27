@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 440">
+  <rect x="4" y="4" width="292" height="432" rx="24" fill="#fff" stroke="#77a6f3" stroke-width="6"/>
+  <g fill="none" stroke="#265cc0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="122" cy="158" r="28"/>
+    <path d="M125 186 L132 310"/>
+    <!-- One hand reaches to the floor, the other is raised -->
+    <path d="M127 205 L150 265 L160 325"/>
+    <path d="M127 205 L72 195 L58 145"/>
+    <!-- Weight on the bent leg, the other one stretched to the side -->
+    <path d="M132 310 L80 345 L88 400"/>
+    <path d="M132 310 L262 400"/>
+  </g>
+</svg>

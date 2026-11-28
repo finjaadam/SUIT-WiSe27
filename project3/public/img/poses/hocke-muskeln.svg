@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 440">
+  <rect x="4" y="4" width="292" height="432" rx="24" fill="#fff" stroke="#77a6f3" stroke-width="6"/>
+  <g fill="none" stroke="#265cc0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="150" cy="190" r="28"/>
+    <path d="M150 218 V340"/>
+    <!-- Double biceps: upper arms out, fists next to the head -->
+    <path d="M150 235 H90 L100 175 M150 235 H210 L200 175"/>
+    <!-- Deep squat: the knees are higher than the hips -->
+    <path d="M150 345 L106 318 L110 400 M150 345 L194 318 L190 400"/>
+  </g>
+</svg>

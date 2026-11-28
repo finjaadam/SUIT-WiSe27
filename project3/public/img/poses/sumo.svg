@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 440">
+  <rect x="4" y="4" width="292" height="432" rx="24" fill="#fff" stroke="#77a6f3" stroke-width="6"/>
+  <g fill="none" stroke="#265cc0" stroke-width="10" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="150" cy="150" r="28"/>
+    <path d="M150 178 V305"/>
+    <!-- Very wide stance with the hands on the knees -->
+    <path d="M150 195 L96 250 L64 318 M150 195 L204 250 L236 318"/>
+    <path d="M150 305 L60 325 L48 400 M150 305 L240 325 L252 400"/>
+  </g>
+</svg>
