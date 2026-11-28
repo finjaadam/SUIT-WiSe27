@@ -5,6 +5,7 @@ import {MemoryGame} from './memory';
 import {MATCH_SCORE, isBodyInFrame, poseScore} from './poseMatch';
 import {POSES} from './poses';
 import {currentScreen, showScreen} from './screens';
+import { startVoiceCommands, stopVoiceCommands, type VoiceCommand } from './speech';
 
 const video        = document.getElementById('video')  as HTMLVideoElement;
 const canvas       = document.getElementById('canvas') as HTMLCanvasElement;
@@ -15,6 +16,7 @@ const poseCards    = document.getElementById('pose-cards') as HTMLDivElement;
 const bestPose     = document.getElementById('best-pose')  as HTMLImageElement;
 const foundPairs   = document.getElementById('found-pairs') as HTMLDivElement;
 const memoryDone   = document.getElementById('memory-done') as HTMLHeadingElement;
+const keyHint = document.querySelector<HTMLParagraphElement>('#key-hint')!;
 const ctx          = canvas.getContext('2d')!;
 const drawingUtils = new DrawingUtils(ctx);
 
@@ -236,7 +238,6 @@ const cardEls = POSES.map((pose, i) => {
 });
 const poseRings = cardEls.map(card => card.querySelector<SVGCircleElement>('.progress')!);
 
-// TODO: Durch Spracherkennung „einloggen“ / „zurück“ ersetzen
 document.addEventListener('keydown', event => {
     if (currentScreen !== 'spiel' || event.repeat) return;
     const key = event.key.toLowerCase();
@@ -244,7 +245,32 @@ document.addEventListener('keydown', event => {
     if (key === 'z') back();
 });
 
+function handleVoiceCommand(command: VoiceCommand): void {
+    if (currentScreen !== 'spiel') return;
+
+    keyHint.innerHTML = `Erkannt: <strong>„${command}“</strong>`;
+    setTimeout(() => {
+        keyHint.innerHTML = 'Sage <strong>„einloggen“</strong> oder <strong>„zurück“</strong>';
+    }, 1500);
+
+    if (command === 'einloggen') logIn();
+    if (command === 'zurück') back();
+}
+
 startBtn.onclick = () => showScreen('spiel');
+
+startBtn.onclick = async () => {
+    showScreen('spiel');
+    keyHint.textContent = 'Sprachsteuerung wird geladen…';
+
+    try {
+        await startVoiceCommands(handleVoiceCommand);
+        keyHint.innerHTML = 'Sage <strong>„einloggen“</strong> oder <strong>„zurück“</strong>';
+    } catch (err) {
+        console.error('Sprachsteuerung Fehler:', err);
+        keyHint.textContent = 'Mikrofon nicht verfügbar · E = einloggen · Z = zurück';
+    }
+};
 
 render();
 showScreen('start');

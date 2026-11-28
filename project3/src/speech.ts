@@ -16,7 +16,7 @@ export async function startVoiceCommands(
 ): Promise<void> {
   // 1. Modell aus dem public-Ordner laden
   if (!model) {
-    model = await createModel('/models/vosk-model-small-de-0.15.tar.gz');
+    model = await createModel('/models/vosk-model-small-de-0.15.zip');
   }
 
   // 2. Recognizer mit eingeschränkter Grammatik erstellen
