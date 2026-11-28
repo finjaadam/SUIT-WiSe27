@@ -9,7 +9,8 @@
   "dependencies": {
     "@mediapipe/tasks-vision": "^1.2.3",
     "cannon-es": "^0.20.0",
-    "three": "^0.187.0"
+    "three": "^0.187.0",
+    "vosk-browser": "^0.0.8"
   },
   "devDependencies": {
     "typescript": "^7.0.2",
