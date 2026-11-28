@@ -15,6 +15,8 @@ const poseCards    = document.getElementById('pose-cards') as HTMLDivElement;
 const bestPose     = document.getElementById('best-pose')  as HTMLImageElement;
 const foundPairs   = document.getElementById('found-pairs') as HTMLDivElement;
 const memoryDone   = document.getElementById('memory-done') as HTMLHeadingElement;
+const wrongPair    = document.getElementById('wrong-pair') as HTMLHeadingElement;
+const resultText   = document.getElementById('ergebnis-text') as HTMLParagraphElement;
 const ctx          = canvas.getContext('2d')!;
 const drawingUtils = new DrawingUtils(ctx);
 
@@ -37,6 +39,11 @@ const SMOOTHING = 0.3;
 const holdSinceMs: (number | undefined)[] = POSES.map(() => undefined);
 const lastMatchMs: number[] = POSES.map(() => 0);
 const smoothScores: number[] = POSES.map(() => 0);
+
+let feedbackTimeout: number | undefined;
+let wrongPairTimeout: number | undefined;
+let failedAttempts = 0;
+let gameStartTime = 0;
 
 // Every pose turns one card, so there are only as many pairs as half the poses
 // TODO: Weitere Posen in poses.ts ergänzen, dann kommen mehr Paare ins Spiel
@@ -166,14 +173,19 @@ function render(): void {
         card.classList.toggle('found', found);
         card.classList.toggle('disabled', !open && !found && !game.isSelectable(slot));
     });
-    memoryDone.hidden = !game.isDone;
 }
 
 function logIn(): void {
     const open = [...game.open];
     const result = game.logIn();
     if (result === 'incomplete') return;
-    if (result === 'noMatch') return render();
+    if (result === 'noMatch') {
+        failedAttempts++;
+        wrongPair.hidden = false;
+        window.clearTimeout(wrongPairTimeout);
+        wrongPairTimeout = window.setTimeout(() => wrongPair.hidden = true, 2000);
+        return render();
+    }
 
     // The two cards slide from the table to the edge
     open.forEach(slot => cardEls[slot].style.viewTransitionName = `card-${slot}`);
@@ -182,6 +194,31 @@ function logIn(): void {
         addFoundPair(open);
         render();
     });
+    if (game.isDone) onMemoryDone();
+}
+
+function startRoundStats(): void {
+    failedAttempts = 0;
+    gameStartTime = performance.now();
+}
+
+function onMemoryDone(): void {
+    const duration = formatDuration(performance.now() - gameStartTime);
+
+    memoryDone.hidden = false;
+    window.clearTimeout(feedbackTimeout);
+
+    feedbackTimeout = window.setTimeout(() => {
+        memoryDone.hidden = true;
+        resultText.textContent = `Dauer: ${duration} | Fehler: ${failedAttempts}`;
+        showScreen('auswertung');
+    }, 3000);
+}
+
+function formatDuration(durationMs: number): string {
+    const seconds = Math.round(durationMs / 1000);
+    if (seconds < 60) return `${seconds} Sekunden`;
+    return `${Math.floor(seconds / 60)}:${String(seconds % 60).padStart(2, '0')} Minuten`;
 }
 
 function back(): void {
@@ -244,7 +281,10 @@ document.addEventListener('keydown', event => {
     if (key === 'z') back();
 });
 
-startBtn.onclick = () => showScreen('spiel');
+startBtn.onclick = () => {
+    showScreen('spiel');
+    startRoundStats();
+};
 
 render();
 showScreen('start');
