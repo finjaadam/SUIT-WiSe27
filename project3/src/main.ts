@@ -5,7 +5,7 @@ import {MemoryGame} from './memory';
 import {MATCH_SCORE, isBodyInFrame, poseScore} from './poseMatch';
 import {POSES} from './poses';
 import {currentScreen, showScreen} from './screens';
-import { startVoiceCommands, stopVoiceCommands, type VoiceCommand } from './speech';
+import { startVoiceCommands, type VoiceCommand } from './speech';
 
 const video        = document.getElementById('video')  as HTMLVideoElement;
 const canvas       = document.getElementById('canvas') as HTMLCanvasElement;
