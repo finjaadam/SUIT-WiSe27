@@ -76,14 +76,23 @@
         position: absolute;
         inset: 0;
         display: grid;
-        grid-template-areas: "a live b" "c live d";
+        grid-template-areas: "questions live answers" "a live b" "c live d";
         place-content: center;
         gap: 4vh;
+        row-gap: 2.5vh;
         z-index: 2;
+      }
+
+      .side-heading {
+        margin: 0;
+        font-size: 3.5vh;
+        text-align: center;
+        color: #265cc0;
       }
 
       #live {
         grid-area: live;
+        align-self: center;
         position: relative;
       }
 
@@ -110,13 +119,143 @@
         transform: scaleX(-1);
       }
 
+      /* Memory card: pose on the front, question or answer on the back */
       .pose-card {
         position: relative;
+        perspective: 120vh;
+        transition: filter 0.3s, opacity 0.3s;
       }
 
-      .pose-card img {
-        display: block;
+      .card-inner {
+        position: relative;
         height: 40vh;
+        aspect-ratio: 300 / 440;
+        transform-style: preserve-3d;
+        transition: transform 0.6s ease;
+      }
+
+      .pose-card.flipped .card-inner {
+        transform: rotateY(180deg);
+      }
+
+      .card-front, .card-back {
+        position: absolute;
+        inset: 0;
+        backface-visibility: hidden;
+      }
+
+      .card-front img {
+        display: block;
+        height: 100%;
+      }
+
+      .card-back {
+        transform: rotateY(180deg);
+        box-sizing: border-box;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        gap: 2vh;
+        padding: 3vh;
+        background: #fff;
+        border: 0.55vh solid #77a6f3;
+        border-radius: 2.2vh;
+        color: #265cc0;
+        text-align: center;
+      }
+
+      .card-label {
+        font-size: 2vh;
+        font-weight: bold;
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        color: #77a6f3;
+      }
+
+      .card-back p {
+        margin: 0;
+        font-size: 2.6vh;
+        line-height: 1.35;
+        color: #292b2c;
+      }
+
+      /* Cards that cannot be turned right now */
+      .pose-card.disabled {
+        filter: grayscale(1);
+        opacity: 0.35;
+      }
+
+      /* Found pairs leave an empty spot on the table */
+      .pose-card.found {
+        visibility: hidden;
+      }
+
+      #found-pairs {
+        position: absolute;
+        top: 3vh;
+        left: 2vh;
+        display: flex;
+        flex-direction: column;
+        gap: 2vh;
+        width: 24vh;
+        z-index: 2;
+      }
+
+      .found-pair {
+        display: flex;
+        flex-direction: column;
+        gap: 1vh;
+      }
+
+      .found-pair p {
+        margin: 0;
+        padding: 1vh 1.5vh;
+        font-size: 1.7vh;
+        line-height: 1.3;
+        background: #fff;
+        border: 0.3vh solid #77a6f3;
+        border-radius: 1.2vh;
+        color: #292b2c;
+      }
+
+      .found-pair p:first-child {
+        color: #265cc0;
+      }
+
+      ::view-transition-group(*) {
+        animation-duration: 0.7s;
+      }
+
+      #memory-done {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: max-content;
+        max-width: 80vw;
+        margin: 0;
+        padding: 16px 32px;
+        font-size: 8vh;
+        text-align: center;
+        color: #265cc0;
+        background: rgba(255, 255, 255, 0.9);
+        border-radius: 16px;
+        z-index: 3;
+      }
+
+      #memory-done[hidden] {
+        display: none;
+      }
+
+      #key-hint {
+        position: absolute;
+        bottom: 2vh;
+        left: 50%;
+        transform: translateX(-50%);
+        margin: 0;
+        font-size: 2vh;
+        color: #77a6f3;
+        z-index: 2;
       }
 
       .pose-ring {
@@ -179,7 +318,13 @@
 
     <section data-screen="spiel" hidden>
       <h1 id="body-hint" hidden>Stell dich so hin, dass du von Kopf bis Fuß zu sehen bist.</h1>
+      <h1 id="memory-done" hidden>Geschafft! Alle Paare gefunden.</h1>
+      <div id="found-pairs"></div>
+      <!-- TODO: Entfällt, sobald die Spracherkennung „einloggen“ / „zurück“ übernimmt -->
+      <p id="key-hint">E = einloggen · Z = zurück</p>
       <div id="pose-cards">
+        <h2 class="side-heading" style="grid-area: questions">Fragen</h2>
+        <h2 class="side-heading" style="grid-area: answers">Antworten</h2>
         <div id="live">
           <img id="best-pose" hidden alt="">
           <canvas id="canvas"></canvas>
